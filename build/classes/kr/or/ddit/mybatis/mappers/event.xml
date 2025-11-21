@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "event">
+	
+	<!-- 공통 이벤트 insert -->
+	<insert id="insertEvent" parameterType="kr.or.ddit.dam.vo.EventVO">
+
+		<selectKey keyProperty="eventId" resultType="int" order="BEFORE">
+			SELECT SEQ_EVENT_ID.NEXTVAL FROM DUAL
+		</selectKey>
+		
+		INSERT INTO EVENT (
+			EVENT_ID, EVENT_TITLE, EVENT_DATE, EVENT_TYPE
+		) VALUES (
+			#{eventId}, #{eventTitle}, SYSDATE, #{eventType}
+		)
+	</insert>
+		
+	<!-- eventType이 chat일 때 insert -->
+	<insert id="insertEventChat" parameterType="kr.or.ddit.dam.vo.EventVO">
+		INSERT INTO EVENT_CHAT (
+			EVENT_ID, EVENT_CHAT_CAPACITY, EVENT_CHAT_LINK, EVENT_CHAT_OPEN_DATE
+		) VALUES (
+			#{eventId}, #{eventChatCapacity}, #{eventChatLink}, TO_DATE(#{eventOpenDate}, 'YYYY-MM-DD"T"HH24:MI')
+		)
+	</insert>
+	
+	<!-- eventType이 nomal일 때 insert -->
+	<insert id="insertEventNomal" parameterType="kr.or.ddit.dam.vo.EventVO">
+		INSERT INTO EVENT_NOMAL (
+			EVENT_ID, EVENT_CONTENT, EVENT_OPEN_DATE
+		) VALUES (
+			#{eventId}, #{eventContent}, TO_DATE(#{eventOpenDate}, 'YYYY-MM-DD"T"HH24:MI')
+		)
+	</insert>
+
+<!-- ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ -->
+
+	<!-- 공통 이벤트 update -->
+	<update id="updateEvent" parameterType="kr.or.ddit.dam.vo.EventVO">
+		UPDATE EVENT
+		   SET EVENT_TITLE = #{eventTitle},
+		       EVENT_DATE = SYSDATE, 
+		       EVENT_TYPE = #{eventType}
+		 WHERE EVENT_ID = #{eventId}
+	</update>
+	
+	<!-- eventType이 chat일 때 update -->
+	<update id="updateEventChat" parameterType="kr.or.ddit.dam.vo.EventVO">
+		UPDATE EVENT_CHAT
+		   SET EVENT_CHAT_CAPACITY = #{eventChatCapacity},
+		       EVENT_CHAT_LINK = #{eventChatLink},
+		       EVENT_CHAT_OPEN_DATE = #{eventOpenDate}
+		 WHERE EVENT_ID = #{eventId}
+	</update>
+	
+	<!-- eventType이 nomal일 때 update -->
+	<update id="updateEventNomal" parameterType="kr.or.ddit.dam.vo.EventVO">
+		UPDATE EVENT_NOMAL
+		   SET EVENT_CONTENT = #{eventContent}
+		 WHERE EVENT_ID = #{eventId}
+	</update>
+	
+<!-- ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ -->
+	
+	<!-- eventType이 chat일 때 delete -->
+	<delete id="deleteEventChat" parameterType="int">
+		DELETE FROM EVENT_CHAT
+		WHERE EVENT_ID = #{eventId}
+	</delete>
+	
+	<!-- eventType이 nomal일 때 delete -->
+	<delete id="deleteEventNomal" parameterType="int">
+		DELETE FROM EVENT_NOMAL
+		WHERE EVENT_ID = #{eventId}
+	</delete>
+	
+	<!-- 공통 이벤트 delete -->
+	<delete id="deleteEvent" parameterType="int">
+		DELETE FROM EVENT
+		WHERE EVENT_ID = #{eventId}
+	</delete>
+	
+<!-- ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ -->
+	
+	<!-- 이벤트 전체 조회 -->
+	<select id="getAllEvents" resultMap="eventMap">
+    	SELECT 
+	        E.EVENT_ID,
+	        E.EVENT_TITLE,
+	        E.EVENT_TYPE,
+	        E.EVENT_DATE,
+	        NVL(EC.EVENT_CHAT_OPEN_DATE, EN.EVENT_OPEN_DATE) AS EVENT_OPEN_DATE
+		  FROM EVENT E
+    	LEFT OUTER JOIN EVENT_CHAT EC ON E.EVENT_ID = EC.EVENT_ID
+    	LEFT OUTER JOIN EVENT_NOMAL EN ON E.EVENT_ID = EN.EVENT_ID
+    	 ORDER BY E.EVENT_ID DESC
+	</select>
+
+	<resultMap id="eventMap" type="kr.or.ddit.dam.vo.EventVO">
+	    <!-- 공통 컬럼 매핑 -->
+	    <id property="eventId" column="EVENT_ID" />
+	    <result property="eventTitle" column="EVENT_TITLE" />
+	    <result property="eventDate" column="EVENT_DATE" />
+	    <result property="eventType" column="EVENT_TYPE" />
+	    <result property="eventOpenDate" column="EVENT_OPEN_DATE" />
+	    <result property="eventContent" column="EVENT_CONTENT" />
+    </resultMap>
+	
+	
+	<!-- 이벤트 하나 조회 -->
+	<select id="getEventById" parameterType="int" resultMap="eventMap">
+		select
+			e.event_id,
+			e.event_title,
+			e.event_type,
+			e.event_date,
+			en.event_content,
+			en.event_open_date
+		from event e
+		left join event_nomal en on e.event_id = en.event_id
+		where e.event_id = #{eventId}
+	</select>
+<!-- ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ -->
+	
+	<!-- 현재 참여 인원 가져오기 -->
+	<select id="getCurrentJoinCount" parameterType="int" resultType="int">
+		SELECT EVENT_CHAT_CRNTJOIN
+		  FROM EVENT_CHAT
+		 WHERE EVENT_ID = #{eventId}
+	</select>
+	
+	<!-- 참여 인원 +1 -->
+	<update id="increaseJoinCount" parameterType="int">
+	    UPDATE EVENT_CHAT
+	       SET EVENT_CHAT_CRNTJOIN = EVENT_CHAT_CRNTJOIN + 1
+	     WHERE EVENT_ID = #{eventId}
+	</update>
+	
+	<!-- 참여 인원 -1 -->
+	<update id="decreaseJoinCount" parameterType="int">
+	    UPDATE EVENT_CHAT
+	       SET EVENT_CHAT_CRNTJOIN = EVENT_CHAT_CRNTJOIN - 1
+	     WHERE EVENT_ID = #{eventId} AND EVENT_CHAT_CRNTJOIN > 0
+	</update>
+	
+</mapper>

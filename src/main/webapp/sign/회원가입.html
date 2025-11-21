@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>회원가입</title>
+  <link rel="shortcut icon" type="image/x-icon" href="../images/logo/찐.png">
+  <script src="../js/jquery-3.7.1.js"></script>
+  <script type="text/javascript" src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+  <script src="../js/join.js"></script>
+  <script src="../js/jquery.serializejson.min.js"></script>
+  
+  <style>
+   * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+
+display: flex;
+justify-content: center; /* 수평 중앙 정렬 */
+align-items: center; /* 수직 중앙 정렬 */
+height: 100vh; /* 화면 전체 높이 사용 */
+margin: 0; /* 기본 마진 제거 */
+background-color: #f7f7f7; /* 배경색 설정 */
+}
+
+.container {
+height:80%;
+width: 100%; /* 기본적으로 가로 100% */
+max-width: 850px; /* 최대 너비 설정 */
+padding: 20px; /* 내부 여백 */
+background-color: #fff; /* 배경색 */
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 그림자 */
+border-radius: 10px; /* 모서리 둥글게 */
+box-sizing: border-box; /* 패딩을 포함한 박스 크기 계산 */
+
+}
+
+h2 {
+text-align: center; /* 제목 중앙 정렬 */
+margin-bottom: 35px;
+font-size: 32px;
+}
+
+    .box {
+      text-align: center; 
+      margin-bottom: 30px; 
+      
+    }
+
+     img {
+      width: 200px;
+      margin-top: 0;
+    }
+
+
+    h3 {
+      font-size: 20px;
+      margin-bottom: 25px; 
+      border-bottom: 1px solid #eee; 
+      padding-bottom: 10px;
+      margin-top: 0
+    }
+
+    form div {
+  display: flex;
+  align-items: center; /* 수직 가운데 정렬 */
+  margin-bottom: 15px;
+}
+
+
+    form label {
+      min-width: 120px; 
+      font-weight: bold;
+      margin-right: 15px; 
+      text-align: left; 
+      font-size: 16px;
+       flex-shrink: 0; 
+    }
+	
+	
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="tel"] {
+      width: 280px; 
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 15px;
+      height: 38px; 
+      box-sizing: border-box; 
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    
+     
+    }
+    
+    input[type="text"]:hover,
+    input[type="password"]:hover,
+    input[type="email"]:hover {
+    transform: translateY(-2px); /* 위로 10px 이동 */
+  
+}
+    
+    form input[type="button"] {
+      padding: 8px 12px;
+      border: 1px solid #ccc; 
+      border-radius: 4px;
+      font-size: 15px;
+      height: 38px; 
+      cursor: pointer;
+      background-color: #f0f0f0; 
+      color: #333; 
+      margin-left: 8px; 
+      flex-shrink: 0;
+      white-space: nowrap;
+      
+    }
+
+
+    #mailcheck, #emailcheck, #otpcheck, #nickcheck, #zipbtn {
+      width: 90px; 
+      padding: 0; 
+      
+    }
+     #mailcheck:hover, #emailcheck:hover, #otpcheck:hover, #nickcheck:hover, #zipbtn:hover{
+     background-color: #a4a5a0
+     
+     } 
+    
+    form input[type="radio"] {
+    margin-left: 40px;
+    margin-right: 3px; 
+  	vertical-align: middle;
+  	transform: scale(1.5);
+     
+    }
+
+    form label input[type="radio"] { 
+      min-width: auto; 
+      font-weight: normal;
+      margin-right: 15px;
+    }
+	
+    #updatespan,
+    #mailspan,
+    #nickspan,
+    #otpspan {
+      color: red;
+      margin-left: 10px;
+      font-size: 0.9em;
+      flex-grow: 1;
+      white-space: nowrap; 
+      min-width: 0;
+      font-size: 15px;
+    }
+#passspan{
+
+	  color: red;
+      font-size: 0.9em;
+      flex-grow: 1;
+      white-space: nowrap; 
+      min-width: 0;
+      position: relative;
+      left: -80px;
+      font-size: 15px;
+
+}
+    
+    form div:has(input#add1),
+    form div:has(input#add2) {
+      margin-left: 135px;
+      margin-right: 100px;
+    }
+    
+     .success-message {
+        color: green;
+}
+
+      form div:has(input#bir) label {
+        margin-right: 5px;
+    }
+    
+    form div:has(input#add1) input,
+    form div:has(input#add2) input {
+      width: 480px;
+    }
+    
+	form div:has(input[name="mem_gender"]) {
+        justify-content: flex-start;
+    }
+    
+    #join {
+      display: block; /* 버튼을 블록 요소로 설정 */
+	  width: 100%; /* 버튼을 100% 너비로 */
+	  max-width: 400px; /* 최대 너비 400px */
+	  padding: 10px;
+	  margin: 20px auto; /* 버튼을 중앙 정렬 */
+	  background-color: #4CAF50; /* 배경색 */
+	  color: white; /* 글자 색 */
+	  border: none;
+	  border-radius: 4px;
+	  font-size: 15px;
+	  cursor: pointer;
+	
+}
+
+    
+    
+    #join:hover{
+  background-color: #45a049; 
+}
+
+  #bir{
+ margin-left: 10px; 
+ 
+  
+}
+
+
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="container mt-3">
+   <img src="../images/logo/찐.png" alt="찐.png" />
+      <h2>회 원 가 입</h2>
+      <form id="ff" autocomplete="off">
+        <div>
+          <label for="mail">이메일</label>
+          <input type="email" id="mem_mail" name="mem_mail" placeholder="&nbsp;이메일 형태로 등록해주세요."/>
+          <input type="button" id="mailcheck" value="중복검사" class="btn" />
+          <input type="button" id="emailcheck" value="이메일 인증" class="btn" />
+          <span id="mailspan"></span>
+        </div>
+        <div id="otpContainer" style="display:none;">
+          <label for="otp">인증번호</label>
+          <input type="text" id="otp" name="otp" />
+          <input type="button" id="otpcheck" value="인증완료" class="btn" />
+          <span id="otpspan"></span>
+        </div>
+        <div>
+          <label for="pass">비밀번호</label>
+          <input type="password" id="pass" name="mem_pass" />
+        </div>
+        <div>
+          <label for="passcheck">비밀번호 확인</label>
+          <input type="password" id="passcheck" name="mem_passcheck" />
+          <span id="passspan" style="margin-left:10px;"></span>
+        </div>
+        <div>
+          <label for="name">이름</label>
+          <input type="text" id="name" name="cust_name" />
+        </div>
+        <div>
+          <label for="bir">생년월일</label>
+          <input type="text" id="bir" name="mem_bir"/ placeholder="&nbsp;생년월일 8자리 입력하세요. ' - ' 제거 ">
+          <label><input type="radio" name="mem_gender" value="M" id="gender_m" />남성</label>
+		    <label><input type="radio" name="mem_gender" value="F" id="gender_f" />여성</label>
+  
+        </div>
+        <div>
+          <label for="nickname">닉네임</label>
+          <input type="text" id="nickname" name="mem_nickname" />
+          <input type="button" id="nickcheck" value="닉네임 인증" class="btn" />
+          <span id="nickspan"></span>
+        </div>
+        <div>
+          <label for="tel">휴대폰번호</label>
+          <input type="text" id="tel" name="cust_tel" placeholder="&nbsp;010-0000-0000"/>
+        </div>
+        <div>
+          <label for="zip">주소</label>
+          <input type="text" id="zip" name="cust_zip"/>
+          <input type="button" id="zipbtn" value="우편번호찾기" class="btn" readonly />
+        </div>
+        <div>
+          <input type="text" id="add1" name="cust_addr1" readonly />
+        </div>
+        <div>
+          <input type="text" id="add2" name="cust_addr2" />
+        </div>
+        <div>
+          <button type="button" id="join" class="btn">확인</button>
+          <span id="joinspan"></span>
+
+          <div id="resultMessage"></div>
+         </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

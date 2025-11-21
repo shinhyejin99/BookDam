@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pay">
+
+<select id="getMemGrade" resultType="String">
+	select mem_grade from member
+	 where mem_mail = #{mem_mail}
+</select>
+
+<insert id="insertOrderDetail" parameterType="kr.or.ddit.dam.vo.OrdersDetailVO">
+	insert into order_detail 
+	values
+	(#{order_no},
+	 #{book_no},
+	 #{order_qty},
+	 #{order_price},
+	 #{earned_mileage}
+	 )
+</insert>
+
+<select id="getTid" resultType="String">
+	select tid from payment
+	where payment_no = #{order_no}
+</select>
+
+<select id="getPaymentInfo" resultType="kr.or.ddit.dam.vo.PaymentVO">
+	select * from payment
+	 where payment_no = #{order_no}
+</select>
+
+<delete id="deleteCartDetail" parameterType="map">
+	delete from cart_detail
+	where cart_no = #{cart_no}
+	  and book_no = #{book_no}
+</delete>
+
+<insert id="insertGiftCheck" parameterType="map">
+	insert into gift_check
+	values
+	(#{order_no},
+	 #{gift_no}
+	 )
+</insert>
+
+<insert id="insertOrderAddr" parameterType="kr.or.ddit.dam.vo.CustVO">
+	insert into order_addr
+	values (
+		#{order_no},
+		#{cust_zip},
+		#{cust_addr1},
+		#{cust_addr2},
+		#{cust_name},
+		#{cust_tel}
+	)
+</insert>
+
+<insert id="insertMileage" parameterType="map">
+	insert into mileage 
+	values (
+		mileage_seq.nextVal,
+		#{mem_mail},
+		#{mileage_type},
+		#{total_mileage},
+		sysdate
+		)
+</insert>
+
+<select id="getMileList" resultType="Integer">
+	select earned_mileage from order_detail
+	 where order_no = #{order_no}
+	
+</select>
+
+<insert id="insertRefund" parameterType="kr.or.ddit.dam.vo.RefundVO">
+	insert into refund values (
+		#{order_no},
+		sysdate,
+		#{rfd_amt},
+		#{rfd_use_mileage},
+		#{rfd_earned_mileage},
+		#{rfd_reason}
+	)
+</insert>
+
+<!-- 주문번호가 Refund 테이블에 있는지 확인 (등급 업데이트 용) -->
+<select id="getCheckRefund" resultType="Integer">
+	select count(*) from refund
+	where order_no = #{order_no}
+</select>
+
+</mapper>

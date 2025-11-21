@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="atchFile">
+
+	<insert id="insertAtchFile" parameterType="kr.or.ddit.dam.vo.AtchFileVO">
+		
+		<selectKey keyProperty="atchFileId" resultType="Long" order="BEFORE">
+			select atch_file_seq.nextval from dual
+		</selectKey>
+		
+		insert into qna_atch_file
+		(
+		ATCH_FILE_ID,
+		qna_qid,
+		CREAT_DT,
+		USE_AT
+		)
+		values
+		(
+		#{atchFileId},
+		#{qnaQid},
+		 sysdate,
+		 'Y'
+		 )
+	</insert>
+	
+	<insert id="insertAtchFileDetail">
+		insert into qna_atch_file_detail
+		(
+		ATCH_FILE_ID,
+		FILE_SN,
+		FILE_STRE_COURS,
+		STRE_FILE_NM,
+		ORIGNAL_FILE_NM,
+		FILE_EXTSN,
+		FILE_CN,
+		FILE_SIZE
+		)
+		values
+		(
+		#{atchFileId},
+		(select nvl(max(file_sn), 0) + 1 
+		from qna_atch_file_detail
+		where atch_file_id = #{atchFileId}),
+		#{fileStreCours},
+		#{streFileNm},
+		#{orignalFileNm},
+		#{fileExtsn},
+		#{fileCn},
+		#{fileSize}
+		)
+	</insert>
+	
+	<!-- qna_atch_file : qna_atch_file_detail = 1 : N -->
+	<resultMap type="atchFileVO" id="atchFileMap">
+		<id property="atchFileId" column="ATCH_FILE_ID"/>
+		<result property="creatDt" column="CREAT_DT"/>
+		<result property="useAt" column="USE_AT"/>
+		<collection property="atchFileDetailList" resultMap="atchFileDetailMap" />
+	</resultMap>
+	
+	<resultMap type="atchFileDetailVO" id="atchFileDetailMap">
+		<id property="atchFileId" column="ATCH_FILE_ID"/>
+		<id property="fileSn" column="FILE_SN"/>
+		<result property="fileStreCours" column="FILE_STRE_COURS"/>
+		<result property="streFileNm" column="STRE_FILE_NM"/>
+		<result property="orignalFileNm" column="ORIGNAL_FILE_NM"/>
+		<result property="fileExtsn" column="FILE_EXTSN"/>
+		<result property="fileCn" column="FILE_CN"/>
+		<result property="fileSize" column="FILE_SIZE"/>
+	</resultMap>
+	
+	<select id="getAtchFile" resultMap="atchFileMap">
+		select * from qna_atch_file af, qna_atch_file_detail afd
+		where af.atch_file_id = afd.atch_file_id
+    		and af.atch_file_id = #{atchFileId}
+    		
+	</select>
+	
+	
+	<select id="getAtchFileDetail" resultMap="atchFileDetailMap">
+		select * from qna_atch_file_detail
+		where atch_file_id = #{atchFileId}
+			and file_sn = #{fileSn}
+	</select>
+	
+	<update id="updateQnaQidForAtchFile" parameterType="map">
+	    UPDATE qna_atch_file
+	    SET qna_qid = #{qnaQid}
+	    WHERE atch_file_id = #{atchFileId}
+</update>
+	
+	<!-- JOIN문이 쓰이면 거의 대부분 resultMap
+	qna_atch_file : qna_atch_file_detail = 1 : N
+	 -->
+	<select id="selectAtchFileByQnaQid" parameterType="int" resultMap="atchFileMap">
+	  SELECT af.ATCH_FILE_ID, af.qna_qid, af.CREAT_DT, af.USE_AT,
+	         afd.FILE_SN, afd.FILE_STRE_COURS, afd.STRE_FILE_NM, afd.ORIGNAL_FILE_NM,
+	         afd.FILE_EXTSN, afd.FILE_CN, afd.FILE_SIZE
+	  FROM qna_atch_file af
+	  LEFT JOIN qna_atch_file_detail afd ON af.ATCH_FILE_ID = afd.ATCH_FILE_ID
+	  WHERE af.qna_qid = #{qnaQid}
+	</select>
+</mapper>

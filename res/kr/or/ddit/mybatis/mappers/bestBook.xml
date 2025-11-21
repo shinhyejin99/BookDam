@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bestBook">
+
+	<!-- 베스트 도서 조회-->
+    <select id="selectBestBook" resultMap="bestBookMap">
+	    select * from (
+	      select
+	      	b.book_no as book_no,
+	        b.book_title as book_title,
+	        b.cover_img as cover_img,
+	        b.book_price as book_price,
+	        sum(d.order_qty) as total_sales
+	      from order_detail d
+	      join book b on d.book_no = b.book_no
+	      group by b.book_title, b.cover_img, b.book_price, b.book_no
+	      order by total_sales DESC
+	    ) 
+    </select>
+
+
+	<!-- 연령대별 조회 -->
+	<select id="selectAge" resultMap="bestBookMap">
+	    select * from (
+	      select
+	        floor((to_number(to_char(SYSDATE, 'YYYY')) - to_number(SUBSTR(m.mem_bir, 1, 4))) / 10) * 10 || '대' as agerange,
+	        b.book_no as book_no,
+	        b.book_title as book_title,
+	        b.cover_img as cover_img,
+	        b.book_price as book_price,
+	        sum(d.order_qty) as total_sales
+	      from order_detail d
+	      join orders o on d.order_no = o.order_no
+	      join member m on o.cust_id = m.mem_mail
+	      join book b on d.book_no = b.book_no
+	      group by floor((to_number(to_char(SYSDATE, 'YYYY')) - to_number(SUBSTR(m.mem_bir, 1, 4))) / 10),
+	               b.book_title, b.cover_img, b.book_price, m.mem_bir, b.book_no
+	      having floor((to_number(to_char(SYSDATE, 'YYYY')) - to_number(SUBSTR(m.mem_bir, 1, 4))) / 10) * 10 || '대' = #{agerange}
+	      order by total_sales DESC
+	    )
+	</select>
+
+    <!-- 카테고리별 베스트 도서 조회 -->
+    <select id="selectCategory" resultType="String">
+	    select category from (
+	      select
+	        b.category,
+	        sum(d.order_qty) as total_sales
+	      from order_detail d
+	      join book b on d.book_no = b.book_no
+	      group by b.category
+	      order by total_sales DESC
+	    )
+	    where rownum  = 1
+    </select>
+
+    <!-- 카테고리별 베스트 도서 조회  -->
+    <select id="selectTopCategory" resultMap="bestBookMap" parameterType="String">
+	    select * from (
+	      select
+	      	b.book_no as book_no,
+	        b.book_title as book_title,
+	        b.cover_img as cover_img,
+	        b.book_price as book_price,
+	        sum(d.order_qty) as total_sales
+	      from order_detail d
+	      join book b on d.book_no = b.book_no
+	      where b.category = #{category}
+	      group by b.book_title, b.cover_img, b.book_price, b.book_no
+	      order by total_sales DESC
+	    )
+    </select>
+
+	<resultMap type="bestBookVO" id="bestBookMap">
+		<result column="book_title" property="bookTitle" />	
+		<result column="book_price" property="bookPrice" />	
+		<result column="cover_img" property="coverImg" />	
+		<result column="total_sales" property="totalSales" />	
+		<result column="book_no" property="bookNo" />	
+	</resultMap>
+    
+
+</mapper>

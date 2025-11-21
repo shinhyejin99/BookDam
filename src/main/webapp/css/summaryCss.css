@@ -1,0 +1,83 @@
+@charset "UTF-8";
+
+    .summary {
+	  position: fixed;
+	  /* position: absolute; */
+	  top: 230px;        /* 원하는 상단 거리 */
+	  /* right: 150px; */          /* 원하는 우측 거리 */
+	  left: calc(63% + 2% + 10px);
+	  margin-left: 30px;
+	  width: 30%;         /* 적절한 너비 */
+	  max-width: 280px;
+	  background-color: #fff;
+	  border: 1px solid #ccc;
+	  border-radius: 10px;
+	  padding: 20px;
+	  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+	  z-index: 100;         /* 다른 요소 위에 보이게 */
+	}
+
+    .summary p, .summary .total {
+	  margin: 8px 0;
+	}
+	
+	.btn-next {
+	  margin-top: 20px;
+	  width: 100%;
+	  padding: 10px;
+	  background-color: #F85A44;
+	  color: white;
+	  border: none;
+	  border-radius: 5px;
+	  cursor: pointer;
+	  
+	  font-size: 16px;
+      font-weight: bold;
+	}
+	
+	.btn-next:hover {
+      background-color: rgb(200, 54, 38);
+  }
+	
+	
+	 #summary-title {
+	 	color : #272727;
+	   font-weight: bold;
+    	text-align: center;
+    	margin-bottom: 20px;
+    }
+    
+    .summary-hr {
+    	height : 1px;
+    	background-color : #D5D5D5;
+    	border : none;
+    	margin: 7% auto; /* 상하 여백 + 가운데 정렬 */
+    }
+    
+    .summary div{
+    	padding: 2px;
+    }
+    
+    .price-container, .deliveryprice-container, .usedmileage-container, .earnedmileage-container{
+    	display: flex;
+    	justify-content: space-between;
+    }
+    
+    .totalprice-container {
+    	font-weight: bold;
+    	font-size: 17px;
+    }
+    
+    
+    .totalprice-section {
+    	font-size: 22px;
+    	text-align: right;
+    }
+    
+    .earnedmileage-container {
+    	color: rgb(165, 165, 165);
+    }
+	
+	
+	
+	

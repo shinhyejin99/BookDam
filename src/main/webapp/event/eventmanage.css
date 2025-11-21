@@ -1,0 +1,296 @@
+@charset "UTF-8";
+
+* {
+      box-sizing: border-box;
+    }
+    
+    
+
+body {
+    margin: 0;
+    font-family: initial !important;
+}
+
+#wrap {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+}
+
+/* /////// 사이드 /////// */
+#side {
+	position: fixed;
+	height: 100vh; /* 화면 전체 높이 */
+    width: 12%;
+    background-color: #1a1a1a;
+    color: #fff;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#side h3 {
+    margin-top: 0;
+    font-size: 20px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+#side ul {
+    list-style: none;
+    padding: 0;
+}
+
+#side ul li {
+    margin-bottom: 10px;
+}
+
+#side ul li a {
+    color: #ccc;
+    text-decoration: none;
+    display: block;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+#side ul li.active a,
+#side ul li a:hover {
+    background-color: #444;
+    color: #fff;
+}
+/* ///////////////////// */
+
+/* 오른쪽 본문 */
+.content {
+   margin-left: 13%; /* 사이드바 너비보다 살짝 크게 */
+   width: 88%;
+   flex-grow: 1;
+   padding: 40px;
+ }
+ .content h2 {
+   font-size: 28px;
+   margin-bottom: 15px;
+ }
+ 
+ /* 검색 폼 테이블 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;  
+}
+
+thead {
+	padding: 8px;
+	background-color: black;
+	color: white;
+}
+
+table th, td {
+  border: 1px solid #ccc;
+  padding: 11px 10px;
+  text-align: center;
+  font-size: 16px;
+}
+
+a {
+  text-decoration: none;
+}
+ 
+.search-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 10px;
+}
+
+.search-box input,
+.search-box select,
+.search-box button {
+    /* padding: 5px; */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.search-box button {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.search-box button:hover {
+    background-color: #0056b3;
+}
+
+/* main table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+main th, main td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    font-size: 14px;
+}
+
+main th {
+    background-color: #007bff;
+    color: white;
+} */
+
+.btns {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.btns button {
+    padding: 8px 15px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.btns button:hover {
+    background-color: #218838;
+}
+
+#bookModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+#modalContent {
+    background: white;
+    width: 600px; /* 너비 조정 */
+    max-height: 80vh;
+    overflow-y: auto; /* 스크롤 추가 */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+}
+
+.modal-header h3 {
+    margin-top: 0;
+}
+
+.modal-header span {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#bookForm label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#bookForm input,
+#bookForm textarea {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 4px;
+    box-sizing: border-box;
+}
+
+#bookForm button {
+    margin-top: 15px;
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#bookForm button:hover {
+    background-color: #0056b3;
+}
+
+input[type="text"], input[type="number"], input[type="date"], textarea {
+    width: 300px;
+    padding: 4px;
+    margin-bottom: 10px;
+}
+
+label {
+    display: inline-block;
+    width: 120px;
+}
+
+button {
+    padding: 6px 12px;
+}
+
+.paging {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.paging a {
+    margin: 0 5px;
+    text-decoration: none;
+    color: blue;
+}
+
+.paging strong {
+    margin: 0 5px;
+    color: red;
+}
+
+.event-btn {
+    padding: 5px 10px;
+    background-color: #B0C4DE;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.event-btn:hover {
+    background-color: #DA70D6;
+}
+.qna-event-complete {
+    padding: 5px 10px;
+    background-color: #ced4da;   /* 회색 */
+    color: #495057;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    text-decoration: none;
+    pointer-events: none;
+    opacity: 0.8;
+}
+/* 수정 버튼용: 연한 파란색 */
+.event-btn-edit {
+    padding: 5px 10px;
+    background-color: #91a7ff; /* 연한 파란색 */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.event-btn-edit:hover {
+    background-color: #748ffc;
+}

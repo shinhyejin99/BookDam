@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="review">
+
+	<!-- 리뷰 등록 -->
+	<insert id="insertReview" parameterType="reviewVO">
+		insert into book_review (
+			RV_ID,
+			RV_CONTENT,
+			RV_DATE,
+			RATING,
+			PURCHASED,
+			SPOILER,
+			LIKE_COUNT,
+			REPORT_COUNT,
+			BOOK_NO,
+			MEM_MAIL
+		)
+		values 
+		(
+			seq_rv_id.nextval, 
+			#{rv_content, jdbcType=CLOB},
+			sysdate,
+			#{rating},
+			(select case when count(*) > 0 then 'Y' else 'N' end as purchased
+				from order_detail od
+				inner join orders o on(od.order_no=o.order_no)
+				where o.cust_id = #{mem_mail}
+				  and od.book_no = #{book_no}),
+			#{spoiler},
+			0,
+			0,
+			#{book_no},
+			#{mem_mail}
+		)
+	</insert>
+	
+	<!-- 해당 도서의 리뷰 수 조회 -->
+	<select id="getReviewCount" parameterType="long" resultType="int">
+	    select count(*) from book_review
+		where book_no = #{book_no}
+	</select>
+	
+	<!-- 리뷰 리스트 출력 -->
+	<select id="getReviewList" parameterType="map" resultType="reviewVO">
+		<!-- select 별점, 이메일, 작성날짜, 좋아요 수, 내용, 스포일러 여부?, + 회원의 좋아요, 신고 여부(컬럼 따로 만든다. reviewVO에) -->
+		SELECT
+			rv_id,
+			rating, mem_mail, 
+			to_char(rv_date, 'YYYY-MM-DD') as rv_date, 
+			like_count, rv_content, spoiler, purchased,
+			(SELECT count(*) 
+			 FROM review_like 
+		     WHERE rv_id = book_review.rv_id AND mem_mail = #{mem_mail}) AS user_liked,
+		    (SELECT count(*) 
+		     FROM review_report 
+		     WHERE rv_id = book_review.rv_id and mem_mail = #{mem_mail}) AS user_reported,
+			(SELECT mem_nickname FROM member m
+			 WHERE m.mem_mail = book_review.mem_mail) AS mem_nickname
+		FROM book_review
+		WHERE book_no = #{book_no}
+		<!-- 탭이 구매자 탭이 맞다면 "AND purchased='Y'"를 실행해라 (디폴트 값이 전체로 수정됐음)-->
+		<!-- 탭이 전체 탭으로 바뀐다면 그냥 아래 and 절을 실행하지 않아요! 그러면 결국 (구매+구매하지 않은) 리뷰들이 출력됩니다!! -->
+		<if test="tabType != null and tabType == 'buyer'">
+			AND purchased='Y'
+		</if>
+		<choose>
+	        <when test="sortType == 'latest'">
+	            ORDER BY rv_date DESC
+	        </when>
+	        <when test="sortType == 'likes'">
+	            ORDER BY like_count DESC, rv_date DESC
+	        </when>
+	        <when test="sortType == 'oldest'">
+	            ORDER BY rv_date ASC, rv_date DESC
+	        </when>
+	        <otherwise>
+	            ORDER BY like_count DESC, rv_date DESC  <!-- 기본: 좋아요순 -->
+	        </otherwise>
+	    </choose>
+	</select>
+	
+	<!-- 회원의 중복 리뷰 체크 -->
+	<select id="reviewCheck" parameterType="map" resultType="int">
+		select count(*) from book_review
+		 where book_no = #{book_no}
+		   and mem_mail = #{mem_mail}
+	</select>
+	
+	<!-- 좋아요 수 업데이트 -->
+	<update id="likeUpdate" parameterType="reviewVO">
+		update book_review
+		set like_count = like_count + #{like_count}
+		where rv_id = #{rv_id}
+	</update>
+		
+	<!-- 좋아요 테이블에 추가 -->
+	<insert id="insertLike" parameterType="reviewVO">
+		insert into review_like (mem_mail, rv_id)
+		values (#{mem_mail}, #{rv_id})
+	</insert>
+	
+	<!-- 좋아요 테이블에 삭제 -->
+	<delete id="deleteLike" parameterType="reviewVO">
+		delete from review_like
+		where mem_mail = #{mem_mail} and rv_id = #{rv_id}
+	</delete>
+	
+	<!-- 사용자의 좋아요 확인 -->
+	<select id="userLikeCheck" parameterType="reviewVO" resultType="int">
+		select count(*) from review_like
+		where mem_mail = #{mem_mail} and rv_id = #{rv_id}
+	</select>
+	
+	<!-- 신고 수 업데이트 -->
+	<update id="reportUpdate" parameterType="reviewVO">
+		update book_review
+		set report_count = report_count + #{report_count}
+		where rv_id = #{rv_id}
+	</update>
+	
+	<!-- 신고 테이블에 추가 -->
+	<insert id="insertReport" parameterType="reviewVO">
+		insert into review_report (mem_mail, rv_id)
+		values (#{mem_mail}, #{rv_id})
+	</insert>
+	
+	<!-- 사용자의 신고 확인 -->
+	<select id="userReportCheck" parameterType="reviewVO" resultType="int">
+		select count(*) from review_report
+		where mem_mail = #{mem_mail} and rv_id = #{rv_id}
+	</select>
+	
+	<!-- 리뷰 수정 -->
+	<update id="updateReview" parameterType="reviewVO">
+		update BOOK_REVIEW
+		set 
+			RV_CONTENT = #{rv_content},
+			RV_DATE = sysdate,
+			RATING = #{rating},
+			SPOILER = #{spoiler}
+		where rv_id = #{rv_id}
+	</update>
+	
+	<!-- 리뷰를 삭제하기 위해서는 자식 테이블인 좋아요 테이블, 신고 테이블 자료를 먼저 삭제해야함! -->
+	<!-- 1. 좋아요 삭제 -->
+	<delete id="deleteReviewLike" parameterType="int">
+		delete from REVIEW_LIKE where rv_id = #{rv_id}
+	</delete>
+    
+    <!-- 2. 신고 삭제 -->
+    <delete id="deleteReviewReport" parameterType="int">
+    	delete from REVIEW_REPORT where rv_id = #{rv_id}
+    </delete>
+
+	<!-- 최종. 리뷰 삭제 -->
+	<delete id="deleteReview" parameterType="int">
+		delete from BOOK_REVIEW
+		where rv_id = #{rv_id}
+	</delete>
+	
+	<!-- 욕설 가져오기 -->
+	<select id="selectBadword" resultType="bwordVO">
+		select bword_id, bword from badword
+	</select>
+	
+
+</mapper>

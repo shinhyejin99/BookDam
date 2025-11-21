@@ -1,0 +1,171 @@
+@charset "UTF-8";
+
+* {
+      box-sizing: border-box;
+    }
+    
+body {
+    margin: 0;
+}
+
+#admin-wrapper {
+	display: flex;
+	flex-direction: row;
+	min-height: 100vh;
+}
+
+/* /////// 사이드 /////// */
+#side {
+	position: fixed;
+	height: 100vh; /* 화면 전체 높이 */
+    width: 12%;
+    background-color: #1a1a1a;
+    color: #fff;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#side h3 {
+    margin-top: 0;
+    font-size: 20px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+#side ul {
+    list-style: none;
+    padding: 0;
+}
+
+#side ul li {
+    margin-bottom: 10px;
+}
+
+#side ul li a {
+    color: #ccc;
+    text-decoration: none;
+    display: block;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+#side ul li.active a,
+#side ul li a:hover {
+    background-color: #444;
+    color: #fff;
+}
+/* ///////////////////// */
+
+/* 오른쪽 본문 */
+.content {
+	  margin-left: 13%; /* 사이드바 너비보다 살짝 크게 */
+	  width: 88%;
+      flex-grow: 1;
+      padding: 40px;
+    }
+    .content h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+
+
+/* 검색 폼 테이블 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+ th, td {
+  border: 1px solid #ccc;
+  padding: 12px 10px;
+  text-align: left;
+}
+
+th {
+  background-color: black;
+  color: white;
+  text-align: center;
+}
+
+.order-table{
+	font-size: 14px;
+}
+    
+
+input[type="text"], 
+input[type="date"], 
+select {
+    /* padding: 6px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px; */
+    padding: 8px;
+    font-size: 16px;
+    width: 220px;
+}
+
+#btnSearch {
+   	  margin-top: 15px;
+   	  margin-bottom: 10px;
+      padding: 10px 20px;
+      font-size: 17px;
+      background-color: black;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+}
+#btnSearch:hover {
+      background-color: #333;
+    }
+    
+.order-list-summary {
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+/* .order-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+}
+
+.order-table th, .order-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+ */
+.update-button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #0078ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.status-update-section {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+.status-radio-group label {
+    margin-right: 20px;
+    font-weight: 500;
+}
+/* ✅ 기본: 모든 테이블 셀 가운데 정렬 */
+.order-table th,
+.order-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* ✅ 도서명만 왼쪽 정렬 */
+.order-table td.book-title {
+  text-align: left;
+}

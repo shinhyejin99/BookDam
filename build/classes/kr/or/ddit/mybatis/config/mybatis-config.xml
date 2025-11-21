@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<properties resource="kr/or/ddit/mybatis/config/db.properties"/>
+	
+	<!-- <settings>
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
+	</settings> -->
+	
+	<settings>
+		<setting name="jdbcTypeForNull" value="NULL"/>
+	</settings>
+	
+	<typeAliases>
+		<typeAlias type="kr.or.ddit.dam.vo.EventVO" alias="eventVO"/>
+		<typeAlias type="kr.or.ddit.dam.vo.BestBookVO" alias="bestBookVO"/>
+		<typeAlias type="kr.or.ddit.dam.vo.BookVO" alias="bookVO"/>
+		<typeAlias type="kr.or.ddit.dam.vo.ReviewVO" alias="reviewVO"/>
+		<typeAlias type="kr.or.ddit.dam.vo.QnaVO" alias="qnaVO"/>
+		<typeAlias type="kr.or.ddit.dam.vo.QnaAnswerVO" alias="qnaAnswerVO"/>
+		<typeAlias type="kr.or.ddit.dam.vo.MemVO" alias="memVO"/>
+ 		<typeAlias type="kr.or.ddit.dam.vo.CustVO" alias="CustVO"/>
+ 		<typeAlias type="kr.or.ddit.dam.vo.BadwordVO" alias="bwordVO"/>
+ 		<typeAlias type="kr.or.ddit.dam.vo.NoMemVO" alias="NoMemVO"/>
+ 		<typeAlias type="kr.or.ddit.dam.vo.AtchFileVO" alias="atchFileVO"/>
+ 		<typeAlias type="kr.or.ddit.dam.vo.AtchFileDetailVO" alias="atchFileDetailVO"/>
+ 		<typeAlias type="kr.or.ddit.dam.vo.SearchVO" alias="searchVO"/>
+ 		<typeAlias type="kr.or.ddit.dam.vo.OrderManageVO" alias="orderManageVO"/>
+ 		<typeAlias type="kr.or.ddit.dam.vo.AttendanceVO" alias="attendVO"/>
+		<typeAlias type="kr.or.ddit.dam.vo.AdminVO" alias="adminVO"/>
+		<typeAlias type="kr.or.ddit.dam.vo.NoticeVO" alias="noticeVO"/>
+
+	</typeAliases>
+	
+	<environments default="dev">
+		<environment id="dev">
+			<transactionManager type="JDBC"/>
+			<dataSource type="POOLED">
+				<property name="driver" value="${driver}"/>
+				<property name="url" value="${url}"/>
+				<property name="username" value="${username}"/>
+				<property name="password" value="${password}"/>
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<!-- 여기에 등록한 mapper 파일의 id만 찾아서 실행하기 때문에 꼭 등록해야함 -->
+	<mappers>
+		<mapper resource="kr/or/ddit/mybatis/mappers/book.xml"/>
+		<mapper resource="kr/or/ddit/mybatis/mappers/review.xml"/>
+		<mapper resource="kr/or/ddit/mybatis/mappers/qna.xml"/>
+		<mapper resource="kr/or/ddit/mybatis/mappers/mem.xml" />	
+		<mapper resource="kr/or/ddit/mybatis/mappers/cust.xml" />
+		<mapper resource="kr/or/ddit/mybatis/mappers/event.xml" />
+		<mapper resource="kr/or/ddit/mybatis/mappers/cart.xml" />
+		<mapper resource="kr/or/ddit/mybatis/mappers/orders.xml" />
+		<mapper resource="kr/or/ddit/mybatis/mappers/pay.xml" />
+		<mapper resource="kr/or/ddit/mybatis/mappers/nomem.xml" />
+		<mapper resource="kr/or/ddit/mybatis/mappers/atchFile.xml" />
+		<mapper resource="kr/or/ddit/mybatis/mappers/bestBook.xml" />
+		<mapper resource="kr/or/ddit/mybatis/mappers/orderManage.xml" />
+		<mapper resource="kr/or/ddit/mybatis/mappers/attendance.xml" />
+		<mapper resource="kr/or/ddit/mybatis/mappers/admin.xml" />
+		<mapper resource="kr/or/ddit/mybatis/mappers/notice.xml" />
+	</mappers>
+		
+</configuration>

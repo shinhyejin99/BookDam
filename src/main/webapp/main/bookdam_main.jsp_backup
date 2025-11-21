@@ -1,0 +1,171 @@
+
+<%@page import="com.google.gson.Gson"%>
+<%@page import="kr.or.ddit.dam.vo.MemVO"%>
+<%@page import="kr.or.ddit.dam.mem.service.MemServiceImpl"%>
+<%@page import="kr.or.ddit.dam.mem.service.IMemService"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>BookDam</title>
+  
+   <script src="../js/jquery-3.7.1.js"></script>
+   <script src="../js/jquery.serializejson.min.js"></script>
+   <script src="../js/bookSearch.js"></script>
+  
+   <link rel="stylesheet" type="text/css" href="<%= request.getContextPath()%>/css/bookSearchCss.css">
+
+  <script>
+  	mypath = '<%= request.getContextPath()%>';
+  	// mypath = BookDam
+  	
+  	currentPage = 1;
+  	memMail = null;
+  	
+ <%
+	MemVO mvo = (MemVO) session.getAttribute("loginOk");
+	
+	String user = null;
+	Gson gson = new Gson();
+	if (mvo != null) user = gson.toJson(mvo);
+%>
+
+	logUser = <%= user == null ? "null" : user %>;
+
+	//로그인 확인용 콘솔창
+	if(logUser != null) {
+		console.log("현재 로그인ID :" + logUser.mem_mail);
+		memMail = logUser.mem_mail;
+	} else {
+		console.log("로그인 상태 : 비회원");
+		memMail = null;
+	}
+
+	////////////////// 다른 페이지에도 필수로 넣어야 하는 이벤트 //////////////////
+	// 로그아웃 (필수)
+	const logout = async () =>{
+		
+		try{
+			response = await fetch('/BookDam/Logout.do');
+			if(!response.ok){
+				throw new Error('서버오류:' + response.status);
+			}
+			result = await response.json();
+			
+			if(result&& result.flag === 'ok') {
+				alert("로그아웃 되었습니다.");
+				sessionStorage.removeItem('cartArr');
+				window.location.href = `../main/bookdam_main.jsp`;
+			} else {
+				alert("로그아웃 실패");
+			}
+		}catch(error){
+			console.error("로그아웃 요청 실패 : " , error);
+			alert("오류발생")
+		}
+	}
+	
+	// 회원 / 비회원 주문 조회
+	const goOrderList = () => {
+		if (logUser != null) {
+			location.href= mypath + '/order/order_list.jsp';		
+		} else {
+			location.href= `\${mypath}/log/login.jsp`	
+		}
+	}
+	////////////////////////////////////////////////////////////////////
+
+  	$(function() {
+	//////////////// 다른 페이지에도 필수로 넣어야 하는 이벤트 //////////////////
+	  	// 검색 버튼 클릭 이벤트 (필수)
+	    $('#search-btn').on('click', function() {  
+		  
+	    	const stype = $('#stype').val();
+			const sword = $('#sword').val().trim();
+			$('#sword-result').text(sword || '전체');
+			
+			console.log(stype, sword);
+		    
+		    currentPage = 1;
+		    console.log("검색버튼 클릭");
+		    location.href = `<%=request.getContextPath()%>/bookSearch/bookSearchRes.jsp?stype=\${stype}&sword=\${sword}&sortType=popularity&currentPage=1`;
+	 	});
+	 	
+	    $('#sword').on('keydown', function(e) {
+			if(e.keyCode == 13 || e.which == 13) {
+		        e.preventDefault(); // 기본 동작 방지
+		        $('#search-btn').click();
+		    }
+		});
+	////////////////////////////////////////////////////////////////////
+  		
+  	})
+
+  </script>
+</head>
+  
+<body>
+
+    <!-- 상단바 (나중에 수정하기) -->
+    <header class="header">
+        <div class="header-content">
+        	<div class="mypage-header">
+        		<% if(mvo == null){ %>
+                	<a href="../log/login.jsp" onclick="alert('로그인으로 이동')">로그인</a>
+           		<%}else{ %>
+           			<a href="javascript:void(0);" onclick="logout()">로그아웃</a>
+           		<% } %>
+           		<a href="#" onclick="alert('마이페이지로 이동')">마이페이지</a>
+        	</div>
+        	<div class="top-header">
+
+	            <!-- 검색 영역 -->
+		        <section class="search-section">
+		        	<div class="search-container">
+		        	<div class="logo">📚 북담</div>
+			            <!-- <form class="search-form" onsubmit="handleSearch(event)"> -->
+			            <form class="search-form">
+			                <select class="search-category" id="stype">
+			                    <option value="all">전체</option>
+			                    <option value="title">도서명</option>
+			                    <option value="author">저자</option>
+			                    <option value="publisher">출판사</option>
+			                </select>
+			                <input type="text" class="search-input" id="sword"
+			                       placeholder="검색할 도서명 또는 저자 또는 출판사를 입력하세요" required>
+			                <button id="search-btn" type="button" class="search-btn">🔍</button>
+			             </form>
+		             
+			             <!-- 헤더 아이콘들 -->
+			             <div class="header-icons">
+			                <button onclick='goOrderList()' class="icon-btn" title="찜목록">❤️</button>
+			              	<!--<button class="icon-btn" title="장바구니">🛒</button>-->
+			                <button onclick="location.href= mypath + '/cart/cart_page.jsp'" class="icon-btn" title="장바구니" >🛒</button>
+			             </div>
+		             </div>
+		        </section> 
+        	</div>
+        	
+        </div>
+    </header>
+        	<!-- 네비게이션 메뉴 -->
+            <nav class="nav-menu">
+                <a href="#" onclick="alert('서점이용안내 페이지로 이동')">서점이용안내</a>
+                <a href="<%= request.getContextPath()%>/bookSearch/bookBestseller.jsp">베스트셀러</a>
+                <a href="#" onclick="alert('문화/행사 페이지로 이동')">문화/행사</a>
+                <a href="#" onclick="alert('공지사항 페이지로 이동')">공지사항</a>
+                <a href="<%=request.getContextPath() %>/QnaList.do" onclick="alert('고객센터 페이지로 이동')">고객센터</a> 
+            </nav>
+        
+    <hr id="nav-bottom">
+
+    <!-- 메인 컨테이너 -->
+    <div class="main-container">
+
+
+    </div> <!-- 메인 컨테이너 끝남 -->
+       
+</body>
+</html>

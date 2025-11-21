@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="notice">
+
+	<!-- (관리자용)공지사항 등록 -->
+	<insert id="insertNotice" parameterType="NoticeVO">
+	    INSERT INTO NOTICE (
+	        NOTICE_ID,
+	        NOTICE_TITLE,
+	        NOTICE_CONTENT,
+	        NOTICE_DATE
+	    ) VALUES (
+	        NOTICE_SEQ.NEXTVAL,
+	        #{noticeTitle},
+	        #{noticeContent},
+	        SYSDATE
+	    )
+	</insert>
+	
+	<!-- (관리자용)공지사항 수정 -->
+	<update id="updateNotice" parameterType="NoticeVO">
+	    UPDATE NOTICE
+	    SET 
+	        NOTICE_TITLE = #{noticeTitle},
+	        NOTICE_CONTENT = #{noticeContent}
+	    WHERE NOTICE_ID = #{noticeId}
+	</update>
+	
+	<!-- (관리자용)공지사항 삭제 -->
+	<delete id="deleteNotice" parameterType="int">
+	    DELETE FROM NOTICE
+	    WHERE NOTICE_ID = #{noticeId}
+	</delete>
+	
+<!-- ______________________________________________ -->
+
+	<!-- (고객용)공지사항 전체 글 조회(주희) -->
+	<select id="getAllNotice" resultMap="noticeMap">
+		SELECT 
+			NOTICE_ID,
+			NOTICE_TITLE,
+			NOTICE_CONTENT,
+			NOTICE_DATE
+		FROM NOTICE
+		ORDER BY NOTICE_ID DESC
+	</select>
+	
+	<!-- (고객용)공지사항 상세 보기(주희) -->
+	<select id="getNoticeById" resultMap="noticeMap">
+		SELECT 
+			NOTICE_ID,
+			NOTICE_TITLE,
+			NOTICE_CONTENT,
+			NOTICE_DATE
+		FROM NOTICE
+		WHERE NOTICE_ID = #{noticeId}
+	</select>
+	
+	<resultMap id="noticeMap" type="NoticeVO">
+		<id property="noticeId" column="NOTICE_ID"/>
+		<result property="noticeTitle" column="NOTICE_TITLE"/>
+		<result property="noticeContent" column="NOTICE_CONTENT"/>
+		<result property="noticeDate" column="NOTICE_DATE"/>
+	</resultMap>
+
+</mapper>

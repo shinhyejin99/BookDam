@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cart">
+
+
+<!--cust_id를 이용해서 cart 테이블에서 cart_no 얻어온다.-->
+<!-- cart_no 이용해서 book_id, cart_qty을 가져온다 --> <!-- 끝  -->
+<!-- book_no를 이용해서 표지, 제목, 저자, 출판사, 금액을 가져온다. -->
+
+<!-- cust_id를 이용해서 cart 테이블에서 cart_no 얻어오고 -->
+<!-- cart_no 이용해서 cart_detail 테이블에서 book_no, cart_qty 가져옴 -->
+<!-- <select id="getCartList" resultType="kr.or.ddit.dam.vo.CartDetailVO">
+	select * from cart_detail
+	where cart_no = (select cart_no from cart
+	                  where cust_id = #{cust_id})
+</select> -->
+
+<select id="getCartBook" resultType="Integer">
+	select count(*) from cart_detail
+	 where cart_no = (select cart_no from cart where cust_id = #{cust_id})
+	 and book_no = #{book_no}
+</select>
+
+
+<select id="getCartList" resultType="kr.or.ddit.dam.vo.CartItemVO">
+	select book.book_no,
+	       cover_img,
+	       book_title,
+	       book_author,
+	       book_price,
+	       cart_qty
+  	 from book
+    inner join cart_detail on book.book_no = cart_detail.book_no
+    where cart_detail.cart_no = (select cart_no from cart where cust_id = #{cust_id})
+</select>
+
+<select id="getDeliveryInfo" resultType="kr.or.ddit.dam.vo.DeliveryVO">
+	select cust_name, 
+	       cust_tel, 
+	       cust_zip, 
+	       cust_addr1, 
+	       cust_addr2, 
+	       mem_mileage
+	  from customer
+	 inner join member on customer.cust_id = member.mem_mail
+	where customer.cust_id = #{cust_id}
+</select>
+
+<delete id="deleteCartDetail" parameterType="map">
+	delete from cart_detail
+	where cart_no = (select cart_no from cart
+	                  where cust_id = #{cust_id})
+	  and book_no = #{book_no}
+</delete>
+
+<delete id="delCart" parameterType="map">
+	delete from cart_detail
+	where cart_no = (select cart_no from cart
+	                  where cust_id = #{cust_id})
+	  and book_no = #{book_no}
+</delete>
+
+<select id="getBookInfo" resultType="kr.or.ddit.dam.vo.BookVO">
+	select book_no,
+		   cover_img,
+	       book_title,
+	       book_author,
+	       book_price
+  	  from book
+     where book_no = #{book_no}
+</select>
+
+<update id="updateMinusQty" parameterType="kr.or.ddit.dam.vo.CartDetailVO">
+	update cart_Detail
+	   set cart_qty = cart_qty - 1
+ 	 where book_no = #{book_no} 
+ 	   and cart_no = (select cart_no from cart where cust_id = #{cust_id})
+</update>
+
+<update id="updatePlusQty" parameterType="kr.or.ddit.dam.vo.CartDetailVO">
+	update cart_Detail
+	   set cart_qty = cart_qty + 1
+ 	 where book_no = #{book_no} 
+ 	   and cart_no = (select cart_no from cart where cust_id = #{cust_id})
+</update>
+
+<insert id="insertCart" parameterType="kr.or.ddit.dam.vo.CartDetailVO">
+	insert into cart_detail values 
+	((select cart_no from cart where cust_id = #{cust_id}), 
+	#{book_no}, 
+	#{cart_qty})
+</insert>
+
+<insert id="insertCartNo" parameterType="String">
+    INSERT INTO cart (cart_no, cust_id)
+    VALUES (cart_no.NEXTVAL, #{cust_id})
+</insert>
+</mapper>

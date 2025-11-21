@@ -1,0 +1,262 @@
+@charset "UTF-8";
+
+* {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+
+    }
+    /* 전체 레이아웃 */
+    .container {
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
+    }
+  
+    /* /////// 사이드 /////// */
+	#side {
+		position: fixed;
+		height: 100vh; /* 화면 전체 높이 */
+	    width: 12%;
+	    background-color: #1a1a1a;
+	    color: #fff;
+	    padding: 20px;
+	    box-sizing: border-box;
+	}
+	
+	#side h3 {
+	    margin-top: 0;
+	    font-size: 20px;
+	    line-height: 1.5;
+	    margin-bottom: 20px;
+	}
+	
+	#side ul {
+	    list-style: none;
+	    padding: 0;
+	}
+	
+	#side ul li {
+	    margin-bottom: 10px;
+	}
+	
+	#side ul li a {
+	    color: #ccc;
+	    text-decoration: none;
+	    display: block;
+	    padding: 5px 10px;
+	    border-radius: 4px;
+	}
+	
+	#side ul li.active a,
+	#side ul li a:hover {
+	    background-color: #444;
+	    color: #fff;
+	}
+	/* ///////////////////// */
+	
+    /* 오른쪽 본문 */
+    .content {
+   	  margin-left: 13%; /* 사이드바 너비보다 살짝 크게 */
+      width: 88%;
+      flex-grow: 1;
+      padding: 40px;
+    }
+    .content h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    
+    /* 검색 폼 테이블 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 12px 10px;
+    }
+    .result-table {
+      font-size: 14px;
+    }
+    
+    .search-table input[type="text"],
+    .search-table input[type="date"],
+    .search-table select {
+      padding: 8px;
+      font-size: 16px;
+      width: 220px;
+    }
+    
+    #btnSearch, 
+     #btnUpgrade{
+      padding: 10px 20px;
+      font-size: 17px;
+      background-color: black;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    #btnSearch:hover {
+      background-color: #333;
+    }
+
+    
+    label {
+      margin-right: 10px;
+    }
+
+    /* 모달 스타일 */
+    #editModal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  overflow: auto; /* 배경에도 스크롤 추가 */
+}
+
+/* 모달 스타일 */
+#editModal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  overflow: auto; /* 배경에도 스크롤 추가 */
+}
+
+/* 모달 콘텐츠 */
+#editModal .modal-content {
+  background-color: #fff;
+  width: 60%;
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  max-height: 80vh;
+  box-sizing: border-box;
+}
+
+/* 모달 닫기 버튼 */
+#editModal .close-btn {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  font-size: 30px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  z-index: 10001;
+}
+
+/* 인풋 필드 및 버튼 스타일 */
+#editModal form input[type="text"],
+#editModal form input[type="password"],
+#editModal form select,
+#editModal form button {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 그림자 */
+}
+
+/* 버튼 스타일 (모달 내의 버튼) */
+#editModal form button {
+  background-color: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#editModal form button:hover {
+  background-color:  #333;
+}
+
+/* 버튼들을 같은 라인에 배치 */
+#editModal .button-container {
+  display: flex;
+  justify-content: space-between; /* 두 버튼을 양쪽 끝에 배치 */
+  gap: 10px; /* 버튼 사이에 간격 추가 */
+}
+
+/* 버튼의 너비를 동일하게 설정 */
+#editModal .button-container button {
+  width: 48%; /* 각 버튼이 한 줄에 두 개씩 들어가도록 너비 설정 */
+}
+
+/* 우편번호 찾기 버튼을 우편번호 입력과 같은 라인에 배치 */
+#editModal .address-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px; /* 우편번호 필드와 그 아래 항목들 간격 조정 */
+}
+
+#editModal .address-container input[type="text"] {
+  width: 75%; /* 우편번호 입력 필드의 너비 설정 */
+}
+
+/* 성별과 닉네임 간격 조정 */
+#editModal .gender-container {
+  margin-bottom: 10px; /* 성별 필드와 그 아래 입력 필드 사이의 간격 추가 */
+}
+
+#editModal #bir {
+  margin-bottom: 10px;
+}
+
+#editModal .gender-container input {
+  margin-right: 10px; /* 성별 옵션 간의 간격 추가 */
+}
+
+/* 등급 갱신 모달 */
+#upgradeModal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  width: 100%;
+  max-width: 400px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#upgradeModal .modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* 등급 갱신 모달 닫기 버튼 */
+#upgradeModal .close-btn {
+  font-size: 30px;
+  color: #333;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}

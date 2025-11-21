@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cust">
+
+	<select id="getAllCust" resultType="CustVO">
+		select * from customer
+	</select>
+	
+	<select id="getCustId" resultType="CustVO">
+		select * from customer where CUST_ID = #{cust_id}
+	</select>
+
+	<insert id="insertCust" parameterType="CustVO">
+		insert into customer(
+		CUST_ID,
+		CUST_NAME,
+		CUST_ZIP,
+		CUST_ADDR1,
+		CUST_ADDR2,
+		CUST_TEL
+		)
+		values(
+		#{cust_id},
+		#{cust_name},
+		#{cust_zip},
+		#{cust_addr1},
+		#{cust_addr2},
+		#{cust_tel}
+		)
+	</insert>
+	
+	<select id="checkCustIdExists" parameterType="String" resultType="int">
+ 		 SELECT COUNT(*) FROM customer WHERE cust_id = #{custId}
+	</select>
+	
+	
+	<select id="loginCust" parameterType="custVO" resultType="custVO">
+	
+		select *
+				from customer where cust_name= #{cust_name,  jdbcType=VARCHAR} 
+	</select>
+	
+	<select id="mailFind" resultType="String" parameterType="map">
+	
+	select cust_id
+	from customer
+	where cust_name = #{cust_name}
+	  and cust_tel = #{cust_tel}
+	
+	</select>
+	
+	<update id="updateCust" parameterType="CustVO">
+	
+	update customer
+	set cust_tel = #{cust_tel},
+	    cust_zip = #{cust_zip},
+		cust_addr1 = #{cust_addr1},
+		cust_addr2 = #{cust_addr2}		    
+	
+	where cust_id = #{cust_id}
+	</update>
+	
+	<select id="getCustById" parameterType="string" resultType="custVO">
+    SELECT * FROM customer WHERE cust_id = #{cust_id}
+</select>
+
+
+ <!-- 회원의 순수 구매액 조회 -->
+    <select id="getMemberGradesByDateRange" parameterType="map" resultType="kr.or.ddit.dam.vo.CustVO">
+       SELECT 
+            c.cust_id, 
+            SUM(od.ORDER_QTY * od.ORDER_PRICE) AS total_amt
+        FROM orders o
+        JOIN customer c ON o.cust_id = c.cust_id
+        JOIN order_detail od ON o.order_no = od.order_no  
+        WHERE TO_DATE(SUBSTR(o.order_no, 1, 8), 'YYYYMMDD') 
+            BETWEEN TO_DATE(#{startDate}, 'YYYYMMDD') AND TO_DATE(#{endDate}, 'YYYYMMDD')
+        GROUP BY c.cust_id
+    </select>
+
+    <!-- 회원 등급 업데이트 -->
+    <update id="updateMemberGrade">
+        
+        UPDATE member
+        SET mem_grade = #{mem_grade}
+        WHERE mem_mail = #{cust_id}
+        
+    </update>
+    
+  
+	
+</mapper>
+	 

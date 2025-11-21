@@ -1,0 +1,239 @@
+@charset "UTF-8";
+
+* {
+    margin: 0;
+	    padding: 0;
+	    box-sizing: border-box;
+	}
+	
+	/* 전체 높이 확실히 설정 */
+	html, body {
+	    height: 100%;
+	}
+	
+	body {
+	    
+	    /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+	    background: #eef0f6;
+	    height: 100vh;
+	    margin: 0;
+	    padding: 20px;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	}
+
+/* ------- 수정---------- */
+	#container {
+		font-family: sans-serif;
+		display: flex;
+	    width: 1200px;
+	    height: 800px;
+	    background: #ffffff;
+	    /* border: 1px solid rgba(255, 255, 255, 0.2); */
+	    border-radius: 20px;
+	    overflow: hidden;
+	    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+	}
+	
+/* -----(7월 4일 수현 추가) 왼쪽 접속자 리스트------------- */	
+	
+	#userListArea {
+		width: 250px;
+	    background: rgba(240, 248, 255, 0.98);
+	    border-right: 1px solid #e0e0e0;
+	    display: flex;
+	    flex-direction: column;
+	    /*border: 2px solid red;  영역 확인용 */
+	}
+	
+	/* 접속자 목록 헤더 */
+	.userlist-header {
+	    background: #54d35d;
+	    color: white;
+	    padding: 13px;
+	    text-align: center;
+	    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	    flex-shrink: 0;
+	}
+	
+	.userlist-header h3 {
+	    font-size: 18px;
+	    font-weight: 600;
+	}
+	
+	/* 접속자 목록 배경*/
+	#userList {
+	    flex: 1;
+	    padding: 15px;
+	    overflow-y: auto;
+	    background: #f8f9fa;
+	}
+	
+	/* 접속자 아이템 */
+	.user-item {
+	    background: white;
+	    padding: 12px 15px;
+	    margin-bottom: 8px;
+	    border-radius: 10px;
+	    border-left: 4px solid #4CAF50;
+	    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	    display: flex;
+	    align-items: center;
+	    gap: 10px;
+	}
+	
+	.user-item .user-icon {
+	    width: 8px;
+	    height: 8px;
+	    background: #4CAF50;
+	    border-radius: 50%;
+	    display: inline-block;
+	}
+	
+	.user-item .user-name {
+	    font-weight: 500;
+	    color: #333;
+	}
+	
+	/* 접속자 수 표시 */
+	.user-count {
+	    font-size: 15px;
+	    color: #f7f7f7;
+	    font-weight: bold;
+	    margin-top: 5px;
+	}
+	
+	/* 접속자 목록 스크롤바 */
+	#userList::-webkit-scrollbar {
+	    width: 4px;
+	}
+	
+	#userList::-webkit-scrollbar-track {
+	    background: #f1f1f1;
+	}
+	
+	#userList::-webkit-scrollbar-thumb {
+	    background: #c1c1c1;
+	    border-radius: 2px;
+	}
+	
+/* ------- 수정---------- */	
+	/* 채팅 영역 */
+	#chatArea {
+		flex: 1;
+	    display: flex;
+	    flex-direction: column;
+	    background: rgba(255, 245, 255, 0.98); /* 영역 확인2 - 분홍색*/
+		/*border: 2px solid blue;  영역 확인용 */
+		height: 100%; /* 추가*/
+	}
+	
+	/* 채팅 헤더 - 채팅방 제목 있는 부분! */
+	.chat-header {
+		background: #54d35d;
+	    color: white;
+	    padding: 23px;
+	    text-align: center;
+	    /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
+	    flex-shrink: 0; /* 헤더가 줄어들지 않도록 */
+	}
+	
+	.chat-header h2 {
+	    font-size: 22px;
+	    font-weight: 600;
+	}
+	
+	/* 메세지 영역 */
+	#messageTextArea {
+		/*border: 2px solid orange;  영역 확인용 */
+	    flex: 1;
+	    padding: 0;
+	    overflow-y: auto;
+	    background: #ffffff;
+	    display: block; /* flex or block으로 => 놉. flex로 하면 크기가 안 맞음. block으로 해야함!!! */
+		height: 78%; /* 높이 설정이 핵심이었네... */
+		flex-direction:column_reverse;  /* 이거랑 위에 높이 설정하니까 되네.... */
+	}
+	
+	/* 메시지 컨테이너 추가 */
+	#messageContainer {
+	    min-height: 100%; /* 전체 높이 차지 */
+	    display: flex;
+	    flex-direction: column;
+	    justify-content: flex-end; /* 메시지를 아래쪽으로 */
+	    padding: 20px; /* padding을 여기로 이동 */
+	    gap: 10px;
+	}
+	
+	/* 스크롤바 부분 */
+	#messageTextArea::-webkit-scrollbar { /* -> 스크롤바 전체를 의미함 */
+	    width: 6px;
+	}
+	
+	#messageTextArea::-webkit-scrollbar-track { /* -> 그 스크롤바 배경? 같은 거! */
+	    background: #f1f1f1;
+	}
+	
+	#messageTextArea::-webkit-scrollbar-thumb { /* -> 그 스크롤바 드래그 하는 영역! */
+	    background: #c1c1c1;
+	    border-radius: 3px;
+	}
+	
+	/* 입력 영역 */
+	.chat-input {
+		background: white;
+	    padding: 20px;
+	    border-top: 1px solid #e0e0e0;
+	    display: flex;
+	    align-items: flex-end;
+	    gap: 12px;
+	    flex-shrink: 0; /* 입력창이 줄어들지 않도록 */
+	}
+	
+	/* 메세지 입력 박스 */
+	#messageText {
+	    flex: 1;
+	    border: 2px solid #e0e0e0;
+	    border-radius: 25px;
+	    padding: 18px 0 0 16px;
+	    font-size: 16px;
+	    resize: none;
+	    outline: none;
+	    transition: border-color 0.3s ease;
+	    font-family: inherit;
+	    min-height: 8px/* 44px */;
+	    line-height: 1.4; /* 줄 간격 조정 */
+	}
+	
+	#messageText:focus {
+	    border-color: #54d35d;
+	}
+	
+	/* 버튼 부분 수정하기 더 예쁘게.. */
+	#btnSend {
+	   height: 64px;
+	   vertical-align: top;
+	   background: #54d35d;
+	   margin-bottom: 2px;
+	   color: white;
+	   border: none;
+	   border-radius: 20px;
+	   padding: 0 16px;
+	   font-size: 14px;
+	   font-weight: 500;
+	   cursor: pointer;
+	   transition: all 0.3s ease;
+	   box-shadow: 0 2px 8px rgba(84, 211, 93, 0.3);
+	}
+	
+	#btnSend:hover {
+	   background: #4bc952;
+	   transform: translateY(-1px);
+	   box-shadow: 0 4px 12px rgba(84, 211, 93, 0.4);
+	}
+	
+	#btnSend:active {
+	   transform: translateY(0);
+	   box-shadow: 0 2px 4px rgba(84, 211, 93, 0.2);
+	}

@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="book">
+
+	<!-- 도서 등록 -->
+	<insert id="insertBook" parameterType="bookVO">
+	    INSERT INTO BOOK (
+	        BOOK_NO, BOOK_TITLE, BOOK_AUTHOR, BOOK_PUBDATE, BOOK_DESCRIPTION, BOOK_PRICE,
+	        PUBLISHER, CATEGORY, COVER_IMG, BOOK_PAGE, STOCK_QTY)
+	    VALUES (
+	        #{book_no}, #{book_title}, #{book_author}, #{book_pubdate}, #{book_description}, #{book_price},
+	        #{publisher}, #{category}, #{cover_img}, #{book_page}, #{stock_qty}
+	    )
+	</insert>
+	
+	<!-- 도서 수정 -->
+	<update id="updateBook" parameterType="bookVO">
+		UPDATE BOOK
+		   SET
+		   	BOOK_TITLE = #{book_title},
+            BOOK_AUTHOR = #{book_author},
+            BOOK_PUBDATE = #{book_pubdate},
+            BOOK_DESCRIPTION = #{book_description},
+            BOOK_PRICE = #{book_price},
+            PUBLISHER = #{publisher},
+            CATEGORY = #{category},
+            COVER_IMG = #{cover_img},
+            BOOK_PAGE = #{book_page},
+            STOCK_QTY = #{stock_qty}
+         WHERE BOOK_NO = #{book_no}
+	</update>
+	
+	<!-- 도서 삭제 -->
+	<delete id="deleteBook" parameterType="long">
+		DELETE
+		  FROM BOOK
+		 WHERE BOOK_NO = #{book_no}
+	</delete>
+	
+	<!-- 도서 상세 조회 -->
+	<select id="getBookById" resultType="bookVO" parameterType="long">
+	    SELECT * FROM book WHERE book_no = #{book_no}
+	</select>
+
+	<!-- 카테고리 중복 제거 조회 -->
+	<select id="distinctCategories" resultType="string">
+	    SELECT DISTINCT category FROM book ORDER BY category
+	</select>
+	
+	<!-- 도서 검색(관리자용) -->
+	<!--<select id="searchBook" resultType="bookVO" parameterType="map">
+		SELECT * FROM (
+			SELECT B.*, ROWNUM RNUM FROM (
+				SELECT * FROM BOOK
+				
+			    ORDER BY BOOK_NO DESC
+			) B
+			 WHERE ROWNUM &lt;= #{offset} + #{limit}
+		)
+		 WHERE RNUM &gt; #{offset}	
+	</select>-->
+
+	<!-- 동적 검색 조건 -->
+	<sql id="dynamicCondition2">
+	    
+	   <trim prefix="where" prefixOverrides="and">
+       <if test="!(stype == '' or sword == '')">
+         and  ${stype} like  '%'||#{sword}||'%'
+       </if>
+       
+       <!-- 카테고리 조건 -->
+       <if test="category != null and category != ''">
+           AND CATEGORY = #{category}
+       </if>
+        
+             
+       <!-- 출판일 조건 -->
+       <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(startDate)">
+       <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(endDate)">
+       	AND  (BOOK_PUBDATE BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') 
+                   AND TO_DATE(#{endDate}, 'YYYY-MM-DD') )
+        </if>
+       </if>
+      
+      <!-- 가격 조건 -->
+        <if  test="minPrice != null  and   minPrice != '' "> 
+        <if  test="maxPrice != null  and   maxPrice != ''  ">
+            AND (BOOK_PRICE  BETWEEN  #{minPrice} AND #{maxPrice} ) 
+        </if> 
+       </if> 
+       
+       <!-- 재고 조건 -->
+        <if test="minStock != null and minStock != '' " > 
+        <if test="maxStock != null and maxStock != '' " > 
+           AND  (STOCK_QTY BETWEEN #{minStock} AND #{maxStock} )
+         </if>   
+        </if> 
+   </trim>
+  </sql>
+  
+ 	<!-- 검색 총 건수 조회 -->
+	<select id="getSearchCounts" parameterType="searchVO" resultType="int">
+	    SELECT COUNT(*) 
+	    FROM BOOK 
+	    <include refid="dynamicCondition2"/>
+	</select>
+
+	<!-- (주희 리스트)  -->
+	<!-- 도서 검색 (JOIN 버전 - 페이징) -->
+	<select id="searchBook" resultType="bookVO" parameterType="map">
+    <!-- map : stype, sword, sortType, start, end -->
+    SELECT A.* FROM
+    (SELECT ROWNUM AS rnum, B.* FROM
+        (SELECT b.book_no,
+                b.book_title,
+                b.book_author,
+                b.book_pubdate,
+                b.book_price,
+                b.publisher,
+                b.category,
+                b.cover_img,
+                b.book_page,
+                b.stock_qty
+         FROM BOOK b
+         LEFT JOIN BOOK_REVIEW br ON b.book_no = br.book_no
+         LEFT JOIN ORDER_DETAIL od ON b.book_no = od.book_no
+         <include refid="dynamicCondition2"/>
+         GROUP BY b.book_no, b.book_title, b.book_author, b.book_pubdate,
+                  b.book_price, b.publisher, b.category, 
+                  b.cover_img, b.book_page, b.stock_qty
+         ) B
+	    <![CDATA[
+	    WHERE ROWNUM <= #{end}) A
+	    WHERE A.rnum >= #{start}
+	    ]]>
+	</select>
+	
+	<select id="selectBookByNo" parameterType="String" resultType="bookVO">
+	  SELECT *
+	  FROM BOOK
+	  WHERE BOOK_NO = #{book_no}
+	</select>
+	
+
+	<!-- 수현) 도서검색 - 근데 주희언니랑 비슷한 게 2개 정도 보여서 상의하고 결정해요! -->
+	
+	<!-- 동적 검색 조건 -->
+	<sql id="dynamicCondition">
+	    <where>
+	        <if test="!(sword == '' or sword == null)">
+	            <choose>
+	                <!-- 전체 선택시: 도서명 또는 저자에서 검색 -->
+	                <when test="stype == 'all' or stype == ''">
+	                    (b.BOOK_TITLE like '%'||#{sword}||'%' OR b.BOOK_AUTHOR like '%'||#{sword}||'%' 
+	                    OR b.PUBLISHER like '%'||#{sword}||'%')
+	                </when>
+	                <!-- 도서명만 검색 -->
+	                <when test="stype == 'title'">
+	                    b.BOOK_TITLE like '%'||#{sword}||'%'
+	                </when>
+	                <!-- 저자만 검색 -->
+	                <when test="stype == 'author'">
+	                    b.BOOK_AUTHOR like '%'||#{sword}||'%'
+	                </when>
+	                <!-- 출판사만 검색 -->
+	                <when test="stype == 'publisher'">
+	                    b.PUBLISHER like '%'||#{sword}||'%'
+	                </when>
+	            </choose>
+	        </if>
+	    </where>
+	</sql>
+	
+	<!-- 검색 총 건수 조회 -->
+	<select id="getSearchCount" parameterType="map" resultType="int">
+	    SELECT COUNT(*) 
+	    FROM BOOK b
+	    <include refid="dynamicCondition"/>
+	</select>
+	
+	<!-- 도서 검색 (JOIN 버전 - 페이징 + 정렬 + 평균별점/리뷰수/판매량 포함) -->
+	<select id="searchBooks" resultType="bookVO" parameterType="map">
+    <!-- map : stype, sword, sortType, start, end -->
+    SELECT A.* FROM
+    (SELECT ROWNUM AS rnum, B.* FROM
+        (SELECT b.book_no,
+                b.book_title,
+                b.book_author,
+                b.book_pubdate,
+                
+                b.book_price,
+                b.publisher,
+                b.category,
+                b.cover_img,
+                b.book_page,
+                b.stock_qty,
+                NVL(ROUND(AVG(br.rating), 1), 0) as avgRating,
+                COUNT(distinct br.rv_id) as reviewCount,
+                NVL(SUM(od.order_qty), 0) as totalSales
+         FROM BOOK b
+         LEFT JOIN BOOK_REVIEW br ON b.book_no = br.book_no
+         LEFT JOIN ORDER_DETAIL od ON b.book_no = od.book_no
+         <include refid="dynamicCondition"/>
+         GROUP BY b.book_no, b.book_title, b.book_author, b.book_pubdate, 
+                  
+                  b.book_price, b.publisher, b.category, 
+                  b.cover_img, b.book_page, b.stock_qty
+         <choose>
+             <!-- 판매인기순 (판매량 많은 순) -->
+             <!-- 아직 데이터가 없어서 book_no 순으로 정렬함 -->
+             <when test="sortType == 'popularity'">
+                 ORDER BY totalSales DESC, b.book_no DESC
+             </when>
+             <!-- 리뷰순 (리뷰 많은 순) -->
+             <!-- 아직 데이터가 없어서 book_no 순으로 정렬함 -->
+             <when test="sortType == 'reviewCount'">
+                 ORDER BY reviewCount DESC, b.book_no DESC
+             </when>
+             <!-- 최신순 (출간일 최신순) -->
+             <when test="sortType == 'latest'">
+                 ORDER BY b.book_pubdate DESC, b.book_no DESC
+             </when>
+             <!-- 기본 정렬 (판매량 많은 순) -->
+		    <otherwise>
+		        ORDER BY totalSales DESC, b.book_no DESC
+		    </otherwise>
+         </choose>
+        ) B
+	    <![CDATA[
+	    WHERE ROWNUM <= #{end}) A
+	    WHERE A.rnum >= #{start}
+	    ]]>
+	</select>
+	
+	<!-- 수현) 도서 상세 페이지 - 책 정보 가져오기 -->
+	<select id="getBookDetail" resultType="bookVO" parameterType="long">
+		select book_no,
+           book_title,
+           book_author,
+           TO_CHAR(book_pubdate, 'YYYY-MM-DD') as book_pubdate,
+           book_description,
+           book_price,
+           publisher,
+           category,
+           cover_img,
+           book_page,
+           stock_qty 
+		from book
+		where book_no = #{bookNo}
+	</select>
+	
+	<!-- 베스트셀러 관련 우선 여기에 작성하고 추후에 bestBook.xml로 이사가든지 아님 그냥 여기에 남길게요 -->
+	<select id="getBestsellerList" resultType="bookVO" parameterType="map">
+		SELECT A.*, ROWNUM as best_rank FROM (
+	        SELECT b.book_no, b.book_title, b.book_author,
+	               b.book_pubdate, b.book_price, b.publisher,
+	               b.category, b.cover_img, b.book_page, b.stock_qty,
+	               sales.totalSales,
+	               NVL(ROUND(reviews.avgRating, 1), 0) as avgRating,
+	           	   NVL(reviews.reviewCount, 0) as reviewCount
+	        FROM BOOK b
+	        INNER JOIN (
+		        SELECT book_no, SUM(order_qty) as totalSales
+		        FROM ORDER_DETAIL
+		        GROUP BY book_no
+		    ) sales ON b.book_no = sales.book_no
+		    LEFT JOIN (
+		        SELECT book_no, AVG(rating) as avgRating, COUNT(*) as reviewCount
+		        FROM BOOK_REVIEW
+		        GROUP BY book_no
+		    ) reviews ON b.book_no = reviews.book_no
+		    ORDER BY sales.totalSales DESC
+		) A
+		 <![CDATA[
+		WHERE ROWNUM <= #{limit}
+		  ]]>       
+	</select>
+	
+	<!-- 책 디테일에서 베스트랭킹 가져오기 위함 sql -->
+	<select id="getBestsellerRank" parameterType="long" resultType="int">
+	    SELECT NVL(
+	        (SELECT best_rank FROM (
+	            SELECT book_no, ROWNUM as best_rank FROM (
+	                SELECT b.book_no
+	                FROM book b
+	                INNER JOIN ORDER_DETAIL od ON b.book_no = od.book_no
+	                GROUP BY b.book_no
+	                ORDER BY SUM(od.order_qty) DESC
+	            )
+	        ) WHERE book_no = #{bookNo}), 
+	        0
+	    ) as rank_result
+	    FROM dual <!-- nvl 때문에 가상 테이블을 뒀음 --> <!-- nvl 안쓰면 null 값을 int로 하려고 해서 : 오류남! 500에러 떠서 사용함 -->
+	</select>
+	
+	
+	<!-- 카테고리 별 도서 검색 (JOIN 버전 - 페이징 + 정렬 + 평균별점/리뷰수/판매량 포함) -->
+	<select id="getBooksByCategory" resultType="bookVO" parameterType="map">
+    <!-- map : stype, sword, sortType, start, end -->
+    SELECT A.* FROM
+    (SELECT ROWNUM AS rnum, B.* FROM
+        (SELECT b.book_no,
+                b.book_title,
+                b.book_author,
+                b.book_pubdate,
+                
+                b.book_price,
+                b.publisher,
+                b.category,
+                b.cover_img,
+                b.book_page,
+                b.stock_qty,
+                NVL(ROUND(AVG(br.rating), 1), 0) as avgRating,
+                COUNT(distinct br.rv_id) as reviewCount,
+                NVL(SUM(distinct od.order_qty), 0) as totalSales
+         FROM BOOK b
+         LEFT JOIN BOOK_REVIEW br ON b.book_no = br.book_no
+         LEFT JOIN ORDER_DETAIL od ON b.book_no = od.book_no
+         where b.category = #{category}
+         GROUP BY b.book_no, b.book_title, b.book_author, b.book_pubdate, 
+                  
+                  b.book_price, b.publisher, b.category, 
+                  b.cover_img, b.book_page, b.stock_qty
+         <choose>
+             <!-- 판매인기순 (판매량 많은 순) -->
+             <!-- 아직 데이터가 없어서 book_no 순으로 정렬함 -->
+             <when test="sortType == 'popularity'">
+                 ORDER BY NVL(SUM(distinct od.order_qty), 0) desc, b.book_no desc
+             </when>
+             <!-- 리뷰순 (리뷰 많은 순) -->
+             <!-- 아직 데이터가 없어서 book_no 순으로 정렬함 -->
+             <when test="sortType == 'reviewCount'">
+                 ORDER BY COUNT(distinct br.rv_id) desc, b.book_no desc
+             </when>
+             <!-- 최신순 (출간일 최신순) -->
+             <when test="sortType == 'latest'">
+                 ORDER BY b.book_pubdate desc, b.book_no desc
+             </when>
+             <!-- 기본 정렬 (판매량 많은 순) -->
+		    <otherwise>
+		         ORDER BY NVL(SUM(distinct od.order_qty), 0) desc, b.book_no desc
+		    </otherwise>
+         </choose>
+        ) B
+	    <![CDATA[
+	    WHERE ROWNUM <= #{end}) A
+	    WHERE A.rnum >= #{start}
+	    ]]>
+	</select>
+	
+	<!-- 카테고리별 도서 총 개수 구하기 -->
+	<select id="getCategoryBookCount" parameterType="string" resultType="int">
+	   SELECT COUNT(*) 
+	   FROM BOOK 
+	   WHERE category = #{category}
+	</select>
+	
+	
+	<!-- 환불 후 재고 채우기 (가영) -->
+	<update id="updateStock" parameterType="map">
+			<choose>
+				<when test="type == 1">
+					update book
+					  set stock_qty = stock_qty + #{order_qty}
+					where book_no = #{book_no}
+				</when>
+				<when test="type == 0">
+					update book
+					  set stock_qty = stock_qty - #{order_qty}
+					where book_no = #{book_no}
+				</when>
+			</choose>
+	</update>
+
+</mapper>

@@ -1,0 +1,45 @@
+package kr.or.ddit.dam.order.controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import kr.or.ddit.dam.order.dao.IOrderDao;
+import kr.or.ddit.dam.order.dao.OrderDaoImpl;
+import kr.or.ddit.dam.vo.GiftVO;
+
+import java.io.IOException;
+import java.util.List;
+
+/**
+ * Servlet implementation class GetGiftSelectInfo
+ */
+@WebServlet("/GetGiftSelectInfo.do")
+public class GetGiftSelectInfo extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public GetGiftSelectInfo() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		int gift_no = Integer.parseInt(request.getParameter("gift_no"));
+		
+		IOrderDao orderDao = OrderDaoImpl.getInstance();
+		GiftVO giftInfo = orderDao.getGiftSelectInfo(gift_no);
+		
+		request.setAttribute("giftInfo", giftInfo);
+		request.getRequestDispatcher("/orderView/giftSelectInfo.jsp").forward(request, response);
+		
+	}
+
+
+}

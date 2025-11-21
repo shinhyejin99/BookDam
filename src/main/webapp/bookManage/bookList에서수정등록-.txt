@@ -1,0 +1,64 @@
+//-----------------------------------------------
+//신규등록 - //도서수정
+$('.editBtn, .registerBtn').on('click', function () {
+	
+    const selected = $('input[name=select]:checked').val();
+    
+    const mode = $(this).hasClass('editBtn') ? 'edit' : 'insert';
+    console.log(selected , mode  );
+    
+    if (mode === 'edit' && !selected) {
+        alert("수정할 도서를 선택하세요.");
+        return;
+    }
+    
+    //수정할 레코드의 각 항목 데이타 가져오기 - 모달창에 출력 
+    if (mode === 'edit'){
+    	    // 선택된 라디오 버튼
+    	    const selectedRadio = document.querySelector('input[name="select"]:checked');
+    	  
+    	    // 선택된 라디오 버튼의 가장 가까운 조상 tr을 찾음
+    	    const selectedRow = selectedRadio.closest('tr');
+    	    
+    	    // 각 td 요소 가져오기
+    	    const tds = selectedRow.querySelectorAll('td');
+
+    	    // 필요한 정보 꺼내기
+    	    bookInfo = {
+    	        book_no: tds[1].textContent.trim(),
+    	        cover_img: tds[2].querySelector('img').getAttribute('src'),
+    	        book_title: tds[3].textContent.trim(),
+    	        book_author: tds[4].textContent.trim(),
+    	        publisher: tds[5].textContent.trim(),
+    	        category: tds[6].textContent.trim(),
+    	        book_pubdate: tds[7].textContent.trim(),
+    	        book_price: tds[8].textContent.trim(),
+    	        stock_qty: tds[9].textContent.trim(),
+    	        created_at: tds[10].textContent.trim()
+    	    };
+
+    	    console.log(bookInfo);
+    	    // 이후 bookInfo를 이용해 수정 폼을 채우거나, 수정 로직 수행 가능
+    }
+    
+     const url = `/bookpro/bookManage/bookForm.jsp?mode=\${mode}` + (selected ? `&book_no=\${selected}` : '');
+   
+     $('#modalContent').load(url, function () {
+         $('#bookModal').fadeIn();
+        
+	      if(mode == 'edit'){
+	      // form에 값 채우기 
+	 	    const form = document.querySelector('#bookModal #bookForm');
+	 	    form.book_no.value = bookInfo.book_no;
+	 	    form.book_title.value = bookInfo.book_title;
+	 	    form.book_author.value = bookInfo.book_author;
+	 	    form.book_pubdate.value = bookInfo.book_pubdate;
+	 	    form.book_price.value = bookInfo.book_price;
+	 	    form.publisher.value = bookInfo.publisher;
+	 	    form.category.value = bookInfo.category;
+	 	    form.cover_img.value = bookInfo.cover_img;
+	 	    form.stock_qty.value = bookInfo.stock_qty;
+	 	    form.created_at.value = bookInfo.created_at;
+	    } 
+   });  //load
+});

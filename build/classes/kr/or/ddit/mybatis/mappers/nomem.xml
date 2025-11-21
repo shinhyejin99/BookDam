@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nomember">
+
+<select id="NoMemberOrder" resultType="NoMemVO" parameterType="NoMemVO">
+
+  select * from No_member where nmem_mail = #{nmem_mail} and nmem_pass = #{nmem_pass}
+
+
+</select>
+
+<insert id="insertNoMember" parameterType="kr.or.ddit.dam.vo.NoMemVO">
+	insert into no_member
+	values (
+		#{nmem_mail},
+		#{nmem_pass}
+	)
+</insert>
+
+
+
+
+</mapper>
+

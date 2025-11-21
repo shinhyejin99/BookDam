@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="attendance">
+	
+	<!-- 오늘 출석체크 여부 확인 -->
+	<select id="todayAttendCheck" parameterType="String" resultType="int">
+		<!-- 출석했으면 1, 아니면 0 리턴 -->
+		select count(*)
+		from attendance
+		where trunc(attendance_date) = trunc(sysdate) and mem_mail = #{mem_mail} <!-- 시분초 절삭 -->
+	</select>
+	
+	<!-- 출석 테이블에 insert -->
+	<insert id="insertAttendance" parameterType="attendVO">
+		insert into attendance
+		values(trunc(sysdate), #{mem_mail}, #{attendance_mileage_amt})
+	</insert>
+	
+	<!-- 회원 테이블에 컬럼 update -->
+	<update id="updateMemMileage" parameterType="map">
+		update member
+		set mem_mileage = mem_mileage + #{attendance_mileage_amt}
+		where mem_mail = #{mem_mail}
+	</update>
+	
+	<!-- 마일리지 테이블에 insert -->
+	<insert id="insertMileage" parameterType="map">
+		insert into mileage 
+		values (
+			mileage_seq.nextVal,
+			#{mem_mail},
+			#{mileageType},
+			#{attendance_mileage_amt},
+			sysdate
+			)
+	</insert>
+	
+	<!-- 출석 현황 데이터 가져오기 -->
+	<select id="loadAttendanceData" parameterType="map" resultType="String">
+		select to_char(ATTENDANCE_DATE, 'YYYY-MM-DD') as ATTENDANCE_DATE
+		from ATTENDANCE
+		where mem_mail = #{mem_mail}
+		and EXTRACT(year from ATTENDANCE_DATE) = #{year}
+		and extract(month from ATTENDANCE_DATE) = #{month}
+	</select>
+
+</mapper>

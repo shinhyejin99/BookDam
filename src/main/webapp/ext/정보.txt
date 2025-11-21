@@ -1,0 +1,13 @@
+접속하기 후 나타나는 chat부분 
+
+chat 대화 출력부분에서 
+textarea을 div로 변경
+
+
+송신 메세지 부분을 input type=text 를  textarea로 변경하고  
+여러줄로 입력 할경우 
+
+jsp onmessage 수신메세지에서 
+출력시 줄바꿈 처리
+
+출력시 나의 메세지와 상대방메세지 구분하기

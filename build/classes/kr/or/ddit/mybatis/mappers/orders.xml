@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="orders">
+
+<select id="getOrdersList" resultType="kr.or.ddit.dam.vo.OrdersVO">
+ select * from orders
+ where cust_id = #{cust_id}
+ order by order_no desc
+</select>
+
+<select id="getOrdersMonthlyList" resultType="kr.or.ddit.dam.vo.OrdersVO">
+   select order_no from orders
+   where cust_id = #{cust_id}
+   and to_date(substr(order_no, 1, 8), 'YYYYMMDD') 
+   between TRUNC(add_months(sysdate, -1), 'MM') and last_day(add_months(sysdate, - 1))
+</select>
+
+<select id="getOrdersDetailList" resultType="kr.or.ddit.dam.vo.OrdersDetailVO">
+    select * from book
+	 inner join order_detail on book.book_no = order_detail.book_no
+	 inner join payment on order_detail.order_no = payment.payment_no
+	 where order_no = #{order_no}
+</select>
+
+<select id="getGiftList" resultType="kr.or.ddit.dam.vo.GiftVO">
+	select * from gift
+</select>
+
+<select id="getGiftSelectInfo" resultType="kr.or.ddit.dam.vo.GiftVO">
+	select * from gift
+	 where gift_no = #{gift_no}
+</select>
+
+<select id="getOrderNo" resultType="Long">
+	SELECT fn_create_order_no(sysdate) FROM DUAL
+</select>
+
+<insert id="insertPayment" parameterType="kr.or.ddit.dam.vo.PaymentVO">
+	insert into payment values
+	(#{payment_no}, sysdate, '결제완료', #{payment_amt}, #{use_mileage}, 3, #{cust_id}, #{tid})
+</insert>
+
+<!-- 최근 주문 5건 조회 -->
+<select id="selectRecentOrders" resultType="kr.or.ddit.dam.vo.OrdersVO">
+  SELECT 
+    order_no, 
+    cust_id, 
+    total_amt, 
+    order_status, 
+    nmem_check
+  FROM orders
+  ORDER BY order_no DESC
+  FETCH FIRST 5 ROWS ONLY
+</select>
+
+</mapper>

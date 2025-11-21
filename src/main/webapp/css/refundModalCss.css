@@ -1,0 +1,78 @@
+@charset "UTF-8";
+
+.refund-modal {
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+}
+
+.refund-modal::backdrop {
+  background-color: rgba(0, 0, 0, 0.5); /* 어두운 배경 처리 */
+}
+
+.refund-success-modal, .refund-fail-modal {
+	width: 420px;
+}
+
+.refund-modal-body {
+  padding: 30px;
+  background: white;
+  border-radius: 10px;
+  text-align: center;
+}
+
+
+#reason {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.submit-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #F86E6E;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background-color: #e05555;
+}
+
+.close-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #888;
+}
+
+.close-btn:hover {
+  background-color: #444;
+}
+
+.confirm-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #F86E6E;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.confirm-btn:hover {
+  background-color: #e05555;
+}

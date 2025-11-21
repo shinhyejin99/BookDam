@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="orderManage">
+
+  <!-- ✅ VO 매핑용 resultMap -->
+  <resultMap id="orderManageResultMap" type="kr.or.ddit.dam.vo.OrderManageVO">
+    <result property="orderNo" column="ORDER_NO" />
+    <result property="custId" column="CUST_ID" />
+    <result property="bookTitle" column="BOOK_TITLE" />
+    <result property="orderQty" column="ORDER_QTY" />
+    <result property="orderPrice" column="ORDER_PRICE" />
+    <result property="totalAmt" column="TOTAL_AMT" />
+    <result property="orderName" column="ORDER_NAME" />
+    <result property="orderZip" column="ORDER_ZIP" />
+    <result property="orderAddr1" column="ORDER_ADDR1" />
+    <result property="orderAddr2" column="ORDER_ADDR2" />
+    <result property="orderStatus" column="ORDER_STATUS" />
+    <result property="paymentStatus" column="PAYMENT_STATUS" />
+    <result property="rn" column="rn" />
+  </resultMap>
+
+  <!-- ✅ 주문 목록 페이징 조회 -->
+  <select id="selectOrderManageList" parameterType="map" resultMap="orderManageResultMap">
+    SELECT * FROM (
+      SELECT ROWNUM rn, A.* FROM (
+        SELECT 
+          od.ORDER_NO,
+          o.CUST_ID,
+          b.BOOK_TITLE,
+          od.ORDER_QTY,
+          od.ORDER_PRICE,
+          o.TOTAL_AMT,
+          oa.ORDER_NAME,
+          oa.ORDER_ZIP,
+          oa.ORDER_ADDR1,
+          oa.ORDER_ADDR2,
+          o.ORDER_STATUS,
+          p.PAYMENT_STATUS
+        FROM ORDER_DETAIL od
+        JOIN ORDERS o      ON od.ORDER_NO = o.ORDER_NO
+        JOIN BOOK b        ON od.BOOK_NO = b.BOOK_NO
+        JOIN ORDER_ADDR oa ON oa.ORDER_NO = od.ORDER_NO
+        LEFT JOIN PAYMENT p ON p.PAYMENT_NO = o.ORDER_NO
+         <trim prefix="where" prefixOverrides="and">
+          <if test="searchType != null and searchWord != null and searchWord != ''">
+            <choose>
+              <when test="searchType == 'orderNo'">
+                AND od.ORDER_NO LIKE '%' || #{searchWord} || '%'
+              </when>
+              <when test="searchType == 'custId'">
+                AND o.CUST_ID LIKE '%' || #{searchWord} || '%'
+              </when>
+              <when test="searchType == 'orderName'">
+                AND oa.ORDER_NAME LIKE '%' || #{searchWord} || '%'
+              </when>
+              <when test="searchType == 'orderAddr'">
+                AND (
+                  oa.ORDER_ZIP LIKE '%' || #{searchWord} || '%'
+                  OR oa.ORDER_ADDR1 LIKE '%' || #{searchWord} || '%'
+                  OR oa.ORDER_ADDR2 LIKE '%' || #{searchWord} || '%'
+                )
+              </when>
+            </choose>
+          </if>
+
+          <if test="startDate != null and endDate != null and startDate != '' and endDate != ''">
+            AND SUBSTR(od.ORDER_NO, 1, 8) BETWEEN #{startDate} AND #{endDate}
+          </if>
+
+          <if test="bookTitle != null and bookTitle != ''">
+            AND b.BOOK_TITLE LIKE '%' || #{bookTitle} || '%'
+          </if>
+
+          <if test="orderStatus != null and orderStatus != '' and orderStatus != '전체'">
+            AND o.ORDER_STATUS = #{orderStatus}
+          </if>
+          
+          <if test="paymentStatus != null and paymentStatus != '' and paymentStatus != '전체'">
+		    AND p.PAYMENT_STATUS = #{paymentStatus}
+		  </if>
+        </trim>
+        ORDER BY o.ORDER_NO DESC
+      ) A
+    )
+    WHERE rn BETWEEN #{start} AND #{end}
+  </select>
+
+  <!-- ✅ 총 주문 수 조회 (페이징용) -->
+  <select id="selectOrderManageCount" parameterType="map" resultType="int">
+    SELECT COUNT(*) 
+    FROM ORDER_DETAIL od
+    JOIN ORDERS o      ON od.ORDER_NO = o.ORDER_NO
+    JOIN BOOK b        ON od.BOOK_NO = b.BOOK_NO
+    JOIN ORDER_ADDR oa ON oa.ORDER_NO = od.ORDER_NO
+    LEFT JOIN PAYMENT p ON p.PAYMENT_NO = o.ORDER_NO
+    <where>
+      <if test="searchType != null and searchWord != null and searchWord != ''">
+        <choose>
+          <when test="searchType == 'orderNo'">
+            AND od.ORDER_NO LIKE '%' || #{searchWord} || '%'
+          </when>
+          <when test="searchType == 'custId'">
+            AND o.CUST_ID LIKE '%' || #{searchWord} || '%'
+          </when>
+          <when test="searchType == 'orderName'">
+            AND oa.ORDER_NAME LIKE '%' || #{searchWord} || '%'
+          </when>
+          <when test="searchType == 'orderAddr'">
+            AND (
+              oa.ORDER_ZIP LIKE '%' || #{searchWord} || '%'
+              OR oa.ORDER_ADDR1 LIKE '%' || #{searchWord} || '%'
+              OR oa.ORDER_ADDR2 LIKE '%' || #{searchWord} || '%'
+            )
+          </when>
+        </choose>
+      </if>
+
+      <if test="startDate != null and endDate != null and startDate != '' and endDate != ''">
+        AND SUBSTR(od.ORDER_NO, 1, 8) BETWEEN #{startDate} AND #{endDate}
+      </if>
+
+      <if test="bookTitle != null and bookTitle != ''">
+        AND b.BOOK_TITLE LIKE '%' || #{bookTitle} || '%'
+      </if>
+
+      <if test="orderStatus != null and orderStatus != '' and orderStatus != '전체'">
+        AND o.ORDER_STATUS = #{orderStatus}
+      </if>
+      
+      <if test="paymentStatus != null and paymentStatus != '' and paymentStatus != '전체'">
+	    AND p.PAYMENT_STATUS = #{paymentStatus}
+	  </if>
+    </where>
+  </select>
+
+  <!-- ✅ 주문 상태 변경 -->
+  <update id="updateOrderStatus" parameterType="map">
+    UPDATE ORDERS
+    SET ORDER_STATUS = #{orderStatus}
+    WHERE ORDER_NO = #{orderNo}
+  </update>
+
+<!-- ✅ 환불 존재 여부 체크 
+  <select id="checkRefundExists" parameterType="string" resultType="int">
+    SELECT COUNT(*) FROM REFUND WHERE ORDER_NO = #{orderNo}
+  </select>
+
+  ✅ 환불 완료일자 갱신
+  <update id="updateRefundCompleteDate" parameterType="string">
+    UPDATE REFUND SET RFD_FDATE = SYSDATE WHERE ORDER_NO = #{orderNo}
+  </update> -->
+
+</mapper>

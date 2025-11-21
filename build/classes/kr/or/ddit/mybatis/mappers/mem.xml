@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="member">
+
+
+
+	<select id="getAllMem" resultType="memVO">
+		select * from member
+	</select>
+
+	<select id="getAllMember" resultType="memVO">
+		select * from member
+	</select>
+
+
+	<select id="loginMember" resultType="memVO"
+		parameterType="memVO">
+
+		select *
+		from member where mem_mail= #{mem_mail,
+		jdbcType=VARCHAR} and mem_pass=#{mem_pass, jdbcType=VARCHAR}
+
+	</select>
+
+	<select id="mailcheck" resultType="String"
+		parameterType="String">
+		select
+		mem_mail from member where mem_mail = #{data}
+	</select>
+	<!-- 비밀번호 찾기: 회원 존재 여부 확인 -->
+	<select id="getMemberForPassFind" parameterType="map"
+		resultType="string">
+		SELECT mem_mail
+		FROM member
+		WHERE mem_mail = #{mem_mail}
+		AND mem_bir = #{mem_bir}
+	</select>
+
+	<!-- 임시 비밀번호 업데이트 -->
+	<update id="updateTempPassword" parameterType="map">
+		UPDATE member
+		SET mem_pass = #{mem_pass}
+		WHERE mem_mail = #{mem_mail}
+	</update>
+
+	<insert id="insertMember" parameterType="memVO">
+		insert into member(
+
+		MEM_MAIL,
+		MEM_PASS,
+		MEM_BIR,
+		MEM_NICKNAME,
+		MEM_GENDER,
+		MEM_MILEAGE,
+		MEM_GRADE,
+		MEM_JOIN,
+		MEM_RESIGN
+
+		)values(
+
+		#{mem_mail},
+		#{mem_pass},
+		#{mem_bir},
+		#{mem_nickname},
+		#{mem_gender},
+		#{mem_mileage},
+		#{mem_grade},
+		#{mem_join, jdbcType=DATE},
+		#{mem_resign,
+		jdbcType=CHAR }
+		)
+
+
+	</insert>
+
+	<select id="getMemberById" resultType="memVO"
+		parameterType="String">
+		SELECT * FROM member WHERE mem_mail = #{mem_mail}
+	</select>
+
+	<select id="nicknamecheck" resultType="String"
+		parameterType="String">
+		SELECT mem_nickname FROM member WHERE mem_nickname = #{value}
+		<!-- MyBatis에서 단순 string 파라미터를 넘길 때 기본적으로 바인딩 네임은 value 임. 즉, 파라미터 이름이
+			없으면 #{value}를 써야 맞고, #{nickname}으로 쓰려면 Map 이나 VO로 감싸서 넘겨야함 -->
+	</select>
+
+
+	<select id="PassFind" resultType="String" parameterType="map">
+
+		select mem_pass
+		from member
+		where mem_mail = #{mem_mail}
+		and mem_bir = #{mem_bir}
+
+	</select>
+
+	<select id="selectByEmail" parameterType="String"
+		resultType="MemVO">
+		SELECT * FROM member WHERE mem_mail = #{mem_mail}
+	</select>
+
+	<update id="updateMember" parameterType="MemVO">
+		update member
+		set
+		mem_pass = #{mem_pass},
+		mem_nickname = #{mem_nickname}
+
+		where mem_mail = #{mem_mail}
+	</update>
+
+
+	<update id="resignMember" parameterType="String">
+		UPDATE member
+		SET mem_RESIGN = 'Y'
+		WHERE mem_mail = #{mem_mail}
+	</update>
+
+
+
+	<select id="getMember" resultType="MemVO" parameterType="String">
+		SELECT *
+		FROM member
+		WHERE mem_mail = #{mem_mail}
+	</select>
+
+	<!-- 멤버 마일리지 업데이트(환불 후처리 용) -->
+	<update id="updateMileage" parameterType="map">
+		update member
+		set mem_mileage = mem_mileage + (#{used_mileage} + #{earned_mileage})
+		where mem_mail = #{mem_mail}
+	</update>
+
+	<!-- Mileage 테이블에 '환불(사용 마일리지)' 내역 insert (환불 후처리 용) -->
+	<insert id="insertUsedMileageInfo" parameterType="map">
+		insert into mileage values(
+		mileage_seq.nextVal,
+		#{mem_mail},
+		'환불(사용마일리지)',
+		#{used_mileage},
+		sysdate
+		)
+	</insert>
+
+	<!-- Mileage 테이블에 '환불(적립 마일리지)' 내역 insert (환불 후처리 용) -->
+	<insert id="insertEarnedMileageInfo" parameterType="map">
+		insert into mileage values (
+		mileage_seq.nextVal,
+		#{mem_mail},
+		'환불(적립마일리지)',
+		#{earned_mileage},
+		sysdate
+		)
+	</insert>
+
+
+
+	<!-- 회원 별로 마일리지 내역을 얻어옴 -->
+	<select id="getMileageList"
+		resultType="kr.or.ddit.dam.vo.MileageVO">
+		select * from mileage
+		where mem_mail = #{mem_mail}
+		order by mileage_date desc
+	</select>
+
+	<select id="searchMember" resultType="kr.or.ddit.dam.vo.MemVO">
+		SELECT * FROM member m
+		JOIN customer c ON m.mem_mail = c.cust_id
+		WHERE 1 = 1
+		<!-- 검색 타입에 따른 검색 조건 -->
+		<if
+			test="searchType != null and searchValue != null and searchValue != ''">
+			<choose>
+				<when test="searchType == 'email'">
+					AND m.MEM_MAIL LIKE '%' || #{searchValue} || '%'
+				</when>
+				<when test="searchType == 'name'">
+					AND c.CUST_NAME LIKE '%' || #{searchValue} || '%'
+				</when>
+				<when test="searchType == 'nickname'">
+					AND m.MEM_NICKNAME LIKE '%' || #{searchValue} || '%'
+				</when>
+			</choose>
+		</if>
+
+		<!-- 생년월일 범위 조건 -->
+		<if
+			test="birthStart != null and birthEnd != null and birthStart != '' and birthEnd != ''">
+			AND m.mem_bir BETWEEN #{birthStart} AND #{birthEnd}
+		</if>
+
+
+		<!-- 가입일 범위 조건 -->
+		<if
+			test="joinStart != null and joinEnd != null and joinStart != '' and joinEnd != ''">
+			AND m.mem_join BETWEEN #{joinStart} AND #{joinEnd}
+		</if>
+
+		<!-- 주소 조건 -->
+		<if test="addr != null and addr != ''">
+			AND (c.cust_addr1 LIKE '%' || #{addr} || '%'
+			OR c.cust_addr2 LIKE '%' || #{addr} || '%')
+		</if>
+
+
+		<!-- 등급 조건 -->
+		<if test="grade != null and grade != '' and grade != 'all'">
+			AND m.mem_grade = #{grade}
+		</if>
+
+	</select>
+
+	<!-- 최근 가입 회원 5명 조회 -->
+	<select id="selectRecentMembers"
+		resultType="kr.or.ddit.dam.vo.MemVO">
+		SELECT
+		mem_mail,
+		mem_nickname,
+		mem_join
+		FROM member
+		ORDER BY mem_join DESC
+		FETCH FIRST 5 ROWS ONLY
+	</select>
+
+
+	<!-- 회원의 한 달 구매 금액을 조회 (가영) -->
+	<select id="getMemMonthlyBuy" resultType="Integer">
+		select nvl(sum(total_amt), 0) as monthlyTotal
+		from orders
+		where cust_id = #{cust_id}
+		and to_date(substr(order_no, 1, 8), 'YYYYMMDD')
+		between TRUNC(add_months(sysdate, -1), 'MM') and last_day(add_months(sysdate,
+		- 1))
+	</select>
+
+	<!-- 주문번호가 refund 테이블에 있는지 확인 (가영) -->
+	<select id="getCheckRefund" resultType="Integer">
+		select count(*) from refund
+		where order_no = #{order_no}
+	</select>
+
+	<!-- 멤버 등급 업데이트 (가영) -->
+	<update id="updateMemGrade" parameterType="map">
+		update member
+		set mem_grade =
+		case
+		when #{monthlyTotal} > 150000 then '다이아몬드등급'
+		when #{monthlyTotal} > 100000 then '골드등급'
+		when #{monthlyTotal} > 50000 then '실버등급'
+		else '일반등급'
+		end
+		where mem_mail = #{mem_mail}
+	</update>
+
+</mapper>

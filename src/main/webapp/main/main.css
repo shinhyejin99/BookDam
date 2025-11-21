@@ -1,0 +1,137 @@
+@charset "UTF-8";
+/* main.css */
+* /* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+}
+
+header {
+  background-color: #ffe0ea;
+  padding: 20px;
+  font-size: 1.5em;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+header ul {
+  list-style: none;   
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+ */
+
+
+/* /// 가영 새로 추가 /// */
+#nav-bottom {
+	margin-bottom: 0
+	
+}
+
+/* .main-banner {
+		width: 100%;
+		height: 450px;
+		background-color: pink;
+} */
+
+/* ////////////////// */
+
+/* 각 도서 영역 섹션 */
+.book-section {
+  margin: 40px auto;
+  padding: 20px;
+  max-width: 1100px;
+}
+
+.book-section h2 {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  border-left: 5px solid #f03d3d;
+  padding-left: 10px;
+}
+
+/* 도서 카드 그리드 (5개씩 가로 정렬) */
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+  justify-content: center;
+}
+
+/* 개별 도서 카드 */
+.book-card {
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s;
+}
+
+.book-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.book-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 0.95em;
+  margin-top: 5px;
+}
+
+.price {
+  color: #e60039;
+  font-weight: bold;
+}
+
+ul.no-dot {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* 추가 */
+.btn-more {
+  font-size: 14px;
+  padding: 6px 12px;
+  background-color: #5c7cfa;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  float: right;
+}
+
+.btn-more:hover {
+  background-color: #3b5bdb;
+}
+
+/* 로고 css */
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  height: 100px;   /* 또는 원하는 크기로 조절 */
+  width: auto;  /* 필요하면 고정 width 설정도 가능 */
+  margin-left: -50px;  
+  margin-bottom: 10px;
+}
